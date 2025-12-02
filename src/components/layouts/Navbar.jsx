@@ -1,62 +1,85 @@
-// import React from 'react';
-// import { FaHome, FaBuilding, FaStore, FaEnvelope, FaUser, FaUserPlus, FaBars } from "react-icons/fa";
-// import Brand from '../Brand';
+import React from "react";
+import Brand from "../Brand";
+import { FaBars, FaUser, FaUserPlus, FaBuilding, FaStore, FaHome, FaEnvelope, FaRegObjectGroup } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom'
 
-// const navItems = [
-//     { id: "home", label: "Home", icon: FaHome },
-//     { id: "houses", label: "Houses", icon: FaBuilding },
-//     { id: "shops", label: "Shops", icon: FaStore },
-//     { id: "contact", label: "Contact", icon: FaEnvelope },
-// ];
+const navItems = [
+    { id: "home", label: "Home", icon: FaHome },
+    { id: "houses", label: "Houses", icon: FaBuilding },
+    { id: "shops", label: "Shops", icon: FaStore },
+    { id: "contact", label: "Contact", icon: FaEnvelope },
+];
 
-// const Navbar = ({ scrollToSection, setIsMenuOpen, setShowSignIn, setShowSignUp }) => (
-//     <header className="bg-indigo-800 shadow-xl px-6 py-4 flex items-center justify-between text-white fixed top-0 left-0 w-full z-50">
-//         <Brand />
+const Navbar = ({ scrollToSection, setIsMenuOpen, setShowSignIn, setShowSignUp }) => {
 
-//         {/* Desktop Menu */}
-//         <nav className="hidden md:flex flex-grow justify-center space-x-6" aria-label="Main Navigation">
-//             {navItems.map(item => (
-//                 <a
-//                     key={item.id}
-//                     href={`#${item.id}`}
-//                     onClick={(e) => {
-//                         e.preventDefault();
-//                         scrollToSection(item.id);
-//                     }}
-//                     className="text-indigo-200 hover:text-white transition duration-200 font-medium flex items-center space-x-2 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300"
-//                 >
-//                     <item.icon className="text-base" /> <span>{item.label}</span>
-//                 </a>
-//             ))}
-//         </nav>
+    const navigate = useNavigate();
 
-//         {/* Desktop Auth Buttons */}
-//         <div className="hidden md:flex space-x-3">
-//             <button
-//                 onClick={() => setShowSignIn(true)}
-//                 className="text-white border border-indigo-500 hover:bg-indigo-700 px-4 py-1.5 rounded-full text-sm transition duration-200 flex items-center space-x-1 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-//             >
-//                 <FaUser size={12} /> <span>Sign In</span>
-//             </button>
-//             <button
-//                 onClick={() => setShowSignUp(true)}
-//                 className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold px-4 py-1.5 rounded-full text-sm transition duration-200 flex items-center space-x-1 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-//             >
-//                 <FaUserPlus size={12} /> <span>Sign Up</span>
-//             </button>
-//         </div>
+    const handleNavigation = (id) => {
+        // Use scrollToSection from HomePage for smooth scroll
+        scrollToSection(id); 
+    };
 
-//         {/* Mobile Hamburger */}
-//         <div className="md:hidden">
-//             <button
-//                 onClick={() => setIsMenuOpen(true)}
-//                 className="text-white text-2xl focus:outline-none p-1 focus:ring-2 focus:ring-indigo-300 rounded"
-//                 aria-label="Toggle navigation menu"
-//             >
-//                 <FaBars />
-//             </button>
-//         </div>
-//     </header>
-// );
 
-// export default Navbar;
+    return (
+        <header className="bg-indigo-800 h-16 text-white px-4 md:px-8 flex justify-between items-center fixed w-full top-0 z-50 shadow-xl">
+            <Brand />
+
+            {/* Desktop Navigation Links (Visible on large screens) */}
+            <nav className="hidden lg:flex space-x-6 xl:space-x-8">
+                {navItems.map(item => (
+                    <a
+                        key={item.id}
+                        href={`#${item.id}`}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            handleNavigation(item.id);
+                        }}
+                        className="text-white text-sm xl:text-base font-medium hover:text-indigo-300 transition duration-200 relative group py-2"
+                    >
+                        {item.label}
+                        <span className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-300 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out"></span>
+                    </a>
+                ))}
+            </nav>
+
+
+            {/* Auth/Admin Buttons - (Visible on medium screens and up) */}
+            <div className="hidden md:flex space-x-3 lg:space-x-4 items-center">
+                {/* Sign In Button */}
+                <button 
+                    className="border border-indigo-500 bg-indigo-700 hover:bg-indigo-600 transition duration-200 px-4 py-1.5 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-300" 
+                    onClick={() => setShowSignIn(true)}
+                >
+                    <FaUser className="inline mr-1 text-xs" /> Sign In
+                </button>
+
+                {/* Sign Up Button - Primary Call to Action */}
+                <button 
+                    className="bg-indigo-500 hover:bg-indigo-400 transition duration-200 px-4 py-1.5 rounded-lg text-sm font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-300" 
+                    onClick={() => setShowSignUp(true)}
+                >
+                    <FaUserPlus className="inline mr-1 text-xs" /> Sign Up
+                </button>
+                
+                {/* Admin Button */}
+                <button
+                    className="hidden lg:block bg-indigo-900 border border-indigo-700 hover:bg-indigo-700 transition duration-200 px-4 py-1.5 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                    onClick={() => navigate('/adminLayout/dashboard')}   
+                >
+                    <FaRegObjectGroup className="inline mr-1 text-xs" /> Admin
+                </button>
+            </div>
+
+            {/* Mobile Menu Toggle Button (Hidden on large screens) */}
+            <button 
+                className="lg:hidden text-2xl p-1 focus:outline-none focus:ring-2 focus:ring-indigo-300 rounded" 
+                onClick={() => setIsMenuOpen(true)}
+                aria-label="Open navigation menu"
+            >
+                <FaBars />
+            </button>
+        </header>
+    );
+};
+
+export default Navbar;
