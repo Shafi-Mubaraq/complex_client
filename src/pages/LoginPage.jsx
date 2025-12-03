@@ -64,16 +64,16 @@ const SignInModal = ({ onClose, onSwitchToSignUp }) => {
 
     return (
         <div className="flex justify-center mt-8" role="dialog" aria-modal="true" aria-labelledby="login-title">
-            <div className="relative max-w-md w-full p-10 bg-white rounded-xl shadow-2xl border border-gray-100">
+            <div className="relative max-w-md w-full p-6 bg-white rounded-xl shadow-2xl border border-gray-100">
 
                 <div className="text-center mb-5">
-                    <h2 id="login-title" className="text-3xl font-extrabold text-gray-900 tracking-tight mb-3">
+                    <h2 id="login-title" className="text-3xl mt-3 font-extrabold text-gray-900 tracking-tight mb-3">
                         Secure Login
                     </h2>
                     <p className="text-sm text-gray-500 mt-1">Access your dashboard.</p>
                 </div>
 
-                <form className="space-y-4" onSubmit={loginUser}>
+                <form className="space-y-6" onSubmit={loginUser}>
                     <CustomInput
                         ref={mobileInputRef}
                         name="mobile"
