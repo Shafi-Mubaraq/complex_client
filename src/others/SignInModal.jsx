@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Modal from "./Modal";
-import CustomInput from "../forms/CustomInput";
+import CustomInput from "../components/Common/CustomInput";
 import { FaEnvelope, FaLock } from "react-icons/fa";
 import axios from 'axios'
 

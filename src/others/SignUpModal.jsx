@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Modal from "./Modal";
-import CustomInput from "../forms/CustomInput";
+import CustomInput from "./forms/CustomInput";
 import {
     FaUser, FaEnvelope, FaKey, FaIdCard, FaMobileAlt,
     FaPhone, FaCity, FaGlobe
@@ -19,9 +19,9 @@ const INITIAL_STATE = {
 
 const SignUpModal = ({ onClose, onSwitchToSignIn }) => {
     const [form, setForm] = useState(INITIAL_STATE);
-    const [loading, setLoading] = useState(false);  
+    const [loading, setLoading] = useState(false);
 
-    const resetForm = () => setForm(INITIAL_STATE); 
+    const resetForm = () => setForm(INITIAL_STATE);
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
