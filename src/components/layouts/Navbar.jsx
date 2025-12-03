@@ -10,13 +10,14 @@ const navItems = [
     { id: "contact", label: "Contact", icon: FaEnvelope },
 ];
 
-const Navbar = ({ scrollToSection, setIsMenuOpen, setShowSignIn, setShowSignUp }) => {
+// Prop change: Replaced 'scrollToSection' with 'setCurrentPage'
+const Navbar = ({ setCurrentPage, setIsMenuOpen, setShowSignIn, setShowSignUp }) => {
 
     const navigate = useNavigate();
 
     const handleNavigation = (id) => {
-        // Use scrollToSection from HomePage for smooth scroll
-        scrollToSection(id); 
+        // Now, we set the active page state in the parent component
+        setCurrentPage(id); 
     };
 
 
@@ -29,10 +30,10 @@ const Navbar = ({ scrollToSection, setIsMenuOpen, setShowSignIn, setShowSignUp }
                 {navItems.map(item => (
                     <a
                         key={item.id}
-                        href={`#${item.id}`}
+                        href="#" // No longer linking to a section ID, just an anchor
                         onClick={(e) => {
-                            e.preventDefault();
-                            handleNavigation(item.id);
+                            e.preventDefault(); 
+                            handleNavigation(item.id); // Triggers state change
                         }}
                         className="text-white text-sm xl:text-base font-medium hover:text-indigo-300 transition duration-200 relative group py-2"
                     >
@@ -64,7 +65,7 @@ const Navbar = ({ scrollToSection, setIsMenuOpen, setShowSignIn, setShowSignUp }
                 {/* Admin Button */}
                 <button
                     className="hidden lg:block bg-indigo-900 border border-indigo-700 hover:bg-indigo-700 transition duration-200 px-4 py-1.5 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-300"
-                    onClick={() => navigate('/adminLayout/dashboard')}   
+                    onClick={() => navigate('/adminLayout/dashboard')}    
                 >
                     <FaRegObjectGroup className="inline mr-1 text-xs" /> Admin
                 </button>

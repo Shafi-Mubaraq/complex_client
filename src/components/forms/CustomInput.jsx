@@ -10,4 +10,4 @@ const CustomInput = ({ icon: Icon, ...rest }) => (
     </div>
 );
 
-export default CustomInput;
+export default CustomInput; 
