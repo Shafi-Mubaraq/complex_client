@@ -207,24 +207,25 @@ const SignInModal = ({ onClose, onSwitchToSignUp }) => {
 
         try {
             const res = await axios.post(`${apiUrl}/api/auth/signin`, form);
+            console.log(res)
 
             if (res.status === 200) {
 
                 const { token, fullName, mobile, role } = res.data;
 
                 // ✅ Store user data in localStorage
-                localStorage.setItem("token", token);
-                localStorage.setItem("fullName", fullName);
-                localStorage.setItem("mobile", mobile);
-                localStorage.setItem("role", role);
+                sessionStorage.setItem("token", token);
+                sessionStorage.setItem("fullName", fullName);
+                sessionStorage.setItem("mobile", mobile);
+                sessionStorage.setItem("role", role);
 
                 alert("Sign in successful!");
-                onClose();
-            }
+                }
 
         } catch (err) {
             const errorMessage =
                 err.response?.data?.message || "Invalid mobile or password.";
+                console.log(err)
             setError(errorMessage);
         }
 

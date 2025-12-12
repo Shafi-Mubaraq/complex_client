@@ -6,7 +6,8 @@ import HousePage from "./pages/HousePage";
 import ShopPage from "./pages/ShopPage";
 import ContactPage from "./pages/ContactPage";
 import LoginPage from "./pages/LoginPage";
-
+import DashboardPage from "./pages/DashboardPage";
+       
 function App() {
 
     return (
@@ -17,6 +18,7 @@ function App() {
                     <Route path="houses" element={<HousePage />} />
                     <Route path="shops" element={<ShopPage />} />
                     <Route path="contact" element={<ContactPage />} />
+                    <Route path="dashboard" element={<DashboardPage />} />
                     <Route path="login" element={<LoginPage />} />
                 </Route>
             </Routes>

@@ -7,6 +7,7 @@ function OverLayout() {
     const [user, setUser] = useState(null);
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
+    const role = sessionStorage.getItem("role");
 
     const linkClass = ({ isActive }) => `cursor-pointer transition font-medium ${isActive ? "text-indigo-600 font-semibold" : "text-gray-600"}`;
 
@@ -32,7 +33,7 @@ function OverLayout() {
                     <NavLink to="/about" className={linkClass}>About</NavLink>
                     <NavLink to="/contact" className={linkClass}>Contact</NavLink>
 
-                    {user && (
+                    {role && (
                         <NavLink to="/dashboard" className={linkClass}>
                             Dashboard
                         </NavLink>
@@ -40,7 +41,7 @@ function OverLayout() {
                 </ul>
 
                 {/* Login / Logout */}
-                {!user ? (
+                {!role ? (
                     <button
                         className="bg-indigo-600 text-white px-5 py-2 rounded-lg font-semibold 
                                    hover:bg-indigo-700 transition duration-150 hidden md:flex items-center gap-1"
