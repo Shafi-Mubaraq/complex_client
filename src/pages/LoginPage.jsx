@@ -181,7 +181,7 @@ const SignInModal = ({ onClose, onSwitchToSignUp }) => {
     const [showPassword, setShowPassword] = useState(false);
 
     const mobileInputRef = useRef(null);
-
+        
     const apiUrl = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
@@ -191,6 +191,7 @@ const SignInModal = ({ onClose, onSwitchToSignUp }) => {
     }, []);
 
     const handleChange = (e) => {
+        console.log(e)
         setForm({ ...form, [e.target.name]: e.target.value });
         setError(null);
     };

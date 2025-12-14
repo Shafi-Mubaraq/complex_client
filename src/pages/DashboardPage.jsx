@@ -1,67 +1,111 @@
-import React from 'react'
-import { Home, Users, Briefcase, Phone, LogIn, LogOut, LayoutDashboard, ThumbsUp, MessageCircle, Building, Store, ClipboardList } from "lucide-react";
+import React, { useState } from "react";
+import {
+    Users,
+    ClipboardList,
+    MessageCircle,
+    Building,
+    Store
+} from "lucide-react";
+
+import UserManage from "../components/Common/UserManage";
+
 const fullName = sessionStorage.getItem("fullName");
-const mobile =sessionStorage.getItem("mobile")
-console.log(fullName)
-const [dashboardSubTab, setDashboardSubTab] = useState("bookings");
-
-
+const mobile = sessionStorage.getItem("mobile");
 
 const DashboardPage = () => {
-  return (  
-        <div className="grid lg:grid-cols-4 gap-8">
-            {/* Sidebar Navigation */}
-            <div className="lg:col-span-1 p-6 bg-white shadow-xl rounded-xl h-fit">
-                <div className="flex items-center space-x-3 mb-6 pb-4 border-b">
+    const [dashboardTab, setDashboardTab] = useState("bookings");
+
+    return (
+        <div className="grid lg:grid-cols-4 gap-8 p-6">
+
+            {/* ================= Sidebar ================= */}
+            <div className="lg:col-span-1 bg-white shadow-xl rounded-xl p-6">
+
+                <div className="flex items-center gap-3 mb-6 border-b pb-4">
                     <div className="p-3 bg-indigo-100 rounded-full">
                         <Users className="w-6 h-6 text-indigo-600" />
                     </div>
                     <div>
-                        <p className="font-bold text-lg">{fullName}</p>
-                        <p className="text-sm text-gray-500">{mobile}
-
-                        </p>
+                        <p className="font-bold text-lg">{fullName || "User"}</p>
+                        <p className="text-sm text-gray-500">{mobile || "No mobile"}</p>
                     </div>
                 </div>
 
                 <nav className="space-y-2">
                     <button
-                        className={`w-full text-left flex items-center gap-3 p-3 rounded-lg transition-colors `}
-                        onClick={()=>setDashboardSubTab("bookings")}
+                        onClick={() => setDashboardTab("users")}
+                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${dashboardTab === "users"
+                                ? "bg-indigo-100 text-indigo-700"
+                                : "hover:bg-gray-100"
+                            }`}
                     >
-                        <ClipboardList className="w-5 h-5" /> My Bookings
+                        <Users />
+                        User Management
                     </button>
+
                     <button
-                        // onClick={() => setDashboardSubTab("complaint")}
-                        className={`w-full text-left flex items-center gap-3 p-3 rounded-lg transition-colors `}
+                        onClick={() => setDashboardTab("bookings")}
+                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${dashboardTab === "bookings"
+                                ? "bg-indigo-100 text-indigo-700"
+                                : "hover:bg-gray-100"
+                            }`}
                     >
-                        <MessageCircle className="w-5 h-5" /> Raise a Request
+                        <ClipboardList />
+                        My Bookings
                     </button>
+
                     <button
-                        // onClick={() => setActiveTab("houses")}
-                        className={`w-full text-left flex items-center gap-3 p-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors`}
+                        onClick={() => setDashboardTab("request")}
+                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${dashboardTab === "request"
+                                ? "bg-indigo-100 text-indigo-700"
+                                : "hover:bg-gray-100"
+                            }`}
                     >
-                        <Building className="w-5 h-5" /> View Houses
+                        <MessageCircle />
+                        Raise Request
                     </button>
+
                     <button
-                        // onClick={() => setActiveTab("shops")}
-                        className={`w-full text-left flex items-center gap-3 p-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors`}
+                        onClick={() => setDashboardTab("houses")}
+                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${dashboardTab === "houses"
+                                ? "bg-indigo-100 text-indigo-700"
+                                : "hover:bg-gray-100"
+                            }`}
                     >
-                        <Store className="w-5 h-5" /> View Shops
+                        <Building />
+                        View Houses
                     </button>
+
+                    <button
+                        onClick={() => setDashboardTab("shops")}
+                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${dashboardTab === "shops"
+                                ? "bg-indigo-100 text-indigo-700"
+                                : "hover:bg-gray-100"
+                            }`}
+                    >
+                        <Store />
+                        View Shops
+                    </button>
+
+                    {/* ✅ User Management */}
+
+
                 </nav>
             </div>
 
-            {/* Content Area */}
-            <div className="lg:col-span-3 p-6 bg-white shadow-xl rounded-xl">
-                {/* {dashboardSubTab === "bookings" && <BookingManager properties={properties} />}
-                {dashboardSubTab === "complaint" && <ComplaintForm />} */}
+            {/* ================= Content ================= */}
+            <div className="lg:col-span-3 bg-white shadow-xl rounded-xl p-6">
+
+                {dashboardTab === "bookings" && <h2>My Bookings</h2>}
+                {dashboardTab === "request" && <h2>Raise Request</h2>}
+                {dashboardTab === "houses" && <h2>Houses</h2>}
+                {dashboardTab === "shops" && <h2>Shops</h2>}
+
+                {dashboardTab === "users" && <UserManage />}
+
             </div>
         </div>
     );
+};
 
-}
-
-export default DashboardPage
-
-
+export default DashboardPage;
