@@ -33,21 +33,10 @@ const DashboardPage = () => {
 
                 <nav className="space-y-2">
                     <button
-                        onClick={() => setDashboardTab("users")}
-                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${dashboardTab === "users"
-                                ? "bg-indigo-100 text-indigo-700"
-                                : "hover:bg-gray-100"
-                            }`}
-                    >
-                        <Users />
-                        User Management
-                    </button>
-
-                    <button
                         onClick={() => setDashboardTab("bookings")}
                         className={`w-full p-3 rounded-lg text-left flex gap-3 ${dashboardTab === "bookings"
-                                ? "bg-indigo-100 text-indigo-700"
-                                : "hover:bg-gray-100"
+                            ? "bg-indigo-100 text-indigo-700"
+                            : "hover:bg-gray-100"
                             }`}
                     >
                         <ClipboardList />
@@ -55,10 +44,22 @@ const DashboardPage = () => {
                     </button>
 
                     <button
+                        onClick={() => setDashboardTab("users")}
+                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${dashboardTab === "users"
+                            ? "bg-indigo-100 text-indigo-700"
+                            : "hover:bg-gray-100"
+                            }`}
+                    >
+                        <Users />
+                        User Management
+                    </button>
+
+
+                    <button
                         onClick={() => setDashboardTab("request")}
                         className={`w-full p-3 rounded-lg text-left flex gap-3 ${dashboardTab === "request"
-                                ? "bg-indigo-100 text-indigo-700"
-                                : "hover:bg-gray-100"
+                            ? "bg-indigo-100 text-indigo-700"
+                            : "hover:bg-gray-100"
                             }`}
                     >
                         <MessageCircle />
@@ -68,8 +69,8 @@ const DashboardPage = () => {
                     <button
                         onClick={() => setDashboardTab("houses")}
                         className={`w-full p-3 rounded-lg text-left flex gap-3 ${dashboardTab === "houses"
-                                ? "bg-indigo-100 text-indigo-700"
-                                : "hover:bg-gray-100"
+                            ? "bg-indigo-100 text-indigo-700"
+                            : "hover:bg-gray-100"
                             }`}
                     >
                         <Building />
@@ -79,8 +80,8 @@ const DashboardPage = () => {
                     <button
                         onClick={() => setDashboardTab("shops")}
                         className={`w-full p-3 rounded-lg text-left flex gap-3 ${dashboardTab === "shops"
-                                ? "bg-indigo-100 text-indigo-700"
-                                : "hover:bg-gray-100"
+                            ? "bg-indigo-100 text-indigo-700"
+                            : "hover:bg-gray-100"
                             }`}
                     >
                         <Store />
