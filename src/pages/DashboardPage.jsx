@@ -3,6 +3,8 @@ import { Home, Users, Briefcase, Phone, LogIn, LogOut, LayoutDashboard, ThumbsUp
 const fullName = sessionStorage.getItem("fullName");
 const mobile =sessionStorage.getItem("mobile")
 console.log(fullName)
+const [dashboardSubTab, setDashboardSubTab] = useState("bookings");
+
 
 
 const DashboardPage = () => {
@@ -25,6 +27,7 @@ const DashboardPage = () => {
                 <nav className="space-y-2">
                     <button
                         className={`w-full text-left flex items-center gap-3 p-3 rounded-lg transition-colors `}
+                        onClick={()=>setDashboardSubTab("bookings")}
                     >
                         <ClipboardList className="w-5 h-5" /> My Bookings
                     </button>
