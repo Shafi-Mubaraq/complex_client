@@ -1,5 +1,5 @@
 import React from 'react';
-import PropertyCard from "../components/Common/PropertyCard";
+import PropertyCard from "../components/Common/PropertyCard"; 
 
 import shops1 from "../assets/shops1.jpg";
 import shops2 from "../assets/img2.jpg";
@@ -10,7 +10,7 @@ const shopData = [
         src: shops1,
         title: "Retail Flagship - Level 1",
         description: "High-visibility ground floor unit. Perfect for flagship retail or luxury showroom.",
-        price: "$4,500/mo",
+        price: "$4,500/mo", // Commercial Price Format
         status: "Available",
         sqft: "1,200",
         suitability: "Retail",
@@ -70,23 +70,26 @@ const shopData = [
 
 const ShopPage = () => {
     const theme = {
-        bg: 'bg-gray-50',
+        // Change: Lighter background for editorial contrast
+        bg: 'bg-gray-100', 
         textPrimary: 'text-gray-900',
         brandAccent: 'text-indigo-600',
     };
 
     return (
-        <section id="shops" className={`${theme.bg} py-16 px-4 min-h-[90vh]`}>
+        <section id="shops" className={`${theme.bg} py-20 px-4 min-h-[90vh]`}>
             <div className="max-w-7xl mx-auto">
-                <h2 className={`text-4xl sm:text-5xl font-extrabold ${theme.textPrimary} mb-4 text-center tracking-tight`}>
-                    Prime Commercial <span className={theme.brandAccent}>Opportunities</span>
+                {/* Header */}
+                <h2 className={`text-5xl font-extrabold ${theme.textPrimary} mb-4 text-center tracking-tight`}>
+                    Commercial <span className={theme.brandAccent}>Leasing</span> Opportunities
                 </h2>
 
-                <p className="text-lg text-gray-500 mb-16 text-center max-w-2xl mx-auto">
+                <p className="text-lg text-gray-600 mb-16 text-center max-w-2xl mx-auto">
                     Secure your business's future in a location with guaranteed foot traffic and modern infrastructure.
                 </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
+                {/* Grid Layout - Responsive */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                     {shopData.map((shop, index) => (
                         <PropertyCard
                             key={`shop-${index}`}
@@ -94,21 +97,25 @@ const ShopPage = () => {
                             alt={`Commercial Unit ${index + 1} - ${shop.suitability}`}
                             title={shop.title}
                             description={shop.description}
+                            // Commercial Props
                             price={shop.price}
                             status={shop.status}
                             sqft={shop.sqft}
-                            beds={shop.suitability}
-                            baths={shop.floor}
+                            
+                            // Map suitability and floor to generic beds/baths slots
+                            beds={shop.suitability} 
+                            baths={shop.floor}      
                         />
                     ))}
                 </div>
 
+                {/* Call to action */}
                 <div className="text-center mt-20">
                     <button
-                        className="bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 text-white font-semibold px-10 py-3 rounded-xl transition duration-300"
+                        className="bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 text-white font-semibold px-12 py-4 rounded-xl transition duration-300 text-lg"
                         onClick={() => alert("Redirecting to Commercial Leasing Form...")}
                     >
-                        View Leasing Brochure
+                        Contact Leasing Team
                     </button>
                 </div>
             </div>
