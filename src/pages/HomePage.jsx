@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {useState, useEffect }from 'react';
 import { MapPin, Zap, ShieldCheck } from 'lucide-react';
+import axios from 'axios';
 
 const HomePage = () => {
 
-    const theme = {
+    const theme = { 
         bg: 'bg-white',
         textPrimary: 'text-gray-900',
         textSecondary: 'text-gray-600',
