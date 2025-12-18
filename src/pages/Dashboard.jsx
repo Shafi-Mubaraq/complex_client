@@ -1,27 +1,19 @@
 import React, { useState } from "react";
-import {
-    Users,
-    ClipboardList,
-    MessageCircle,
-    Building,
-    Store,
-    Home
-} from "lucide-react";
+import { Users, ClipboardList, MessageCircle, Building, Store, Home } from "lucide-react";
 
-import UserManage from "../components/Common/UserManage";
-import PropertyManagePage from"./PropertyManagePage"
+import UserManage from "../pages/UserManage";
+import PropertyManage from "./PropertyManage"
 
 const fullName = sessionStorage.getItem("fullName");
 const mobile = sessionStorage.getItem("mobile");
 
 const DashboardPage = () => {
+
     const [dashboardTab, setDashboardTab] = useState("bookings");
 
     return (
-        <div className="grid lg:grid-cols-4 gap-8 p-6">
-
-            {/* ================= Sidebar ================= */}
-            <div className="lg:col-span-1 bg-white shadow-xl rounded-xl p-6">
+        <div className="grid lg:grid-cols-4 gap-6">
+            <div className="lg:col-span-1 bg-white shadow-xl rounded-xl p-6 h-720px">
 
                 {/* User Info */}
                 <div className="flex items-center gap-3 mb-6 border-b pb-4">
@@ -39,11 +31,10 @@ const DashboardPage = () => {
 
                     <button
                         onClick={() => setDashboardTab("bookings")}
-                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${
-                            dashboardTab === "bookings"
-                                ? "bg-indigo-100 text-indigo-700"
-                                : "hover:bg-gray-100"
-                        }`}
+                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${dashboardTab === "bookings"
+                            ? "bg-indigo-100 text-indigo-700"
+                            : "hover:bg-gray-100"
+                            }`}
                     >
                         <ClipboardList />
                         My Bookings
@@ -51,11 +42,10 @@ const DashboardPage = () => {
 
                     <button
                         onClick={() => setDashboardTab("users")}
-                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${
-                            dashboardTab === "users"
-                                ? "bg-indigo-100 text-indigo-700"
-                                : "hover:bg-gray-100"
-                        }`}
+                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${dashboardTab === "users"
+                            ? "bg-indigo-100 text-indigo-700"
+                            : "hover:bg-gray-100"
+                            }`}
                     >
                         <Users />
                         User Management
@@ -63,11 +53,10 @@ const DashboardPage = () => {
 
                     <button
                         onClick={() => setDashboardTab("request")}
-                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${
-                            dashboardTab === "request"
-                                ? "bg-indigo-100 text-indigo-700"
-                                : "hover:bg-gray-100"
-                        }`}
+                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${dashboardTab === "request"
+                            ? "bg-indigo-100 text-indigo-700"
+                            : "hover:bg-gray-100"
+                            }`}
                     >
                         <MessageCircle />
                         Raise Request
@@ -75,11 +64,10 @@ const DashboardPage = () => {
 
                     <button
                         onClick={() => setDashboardTab("houses")}
-                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${
-                            dashboardTab === "houses"
-                                ? "bg-indigo-100 text-indigo-700"
-                                : "hover:bg-gray-100"
-                        }`}
+                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${dashboardTab === "houses"
+                            ? "bg-indigo-100 text-indigo-700"
+                            : "hover:bg-gray-100"
+                            }`}
                     >
                         <Building />
                         View Houses
@@ -87,24 +75,21 @@ const DashboardPage = () => {
 
                     <button
                         onClick={() => setDashboardTab("shops")}
-                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${
-                            dashboardTab === "shops"
-                                ? "bg-indigo-100 text-indigo-700"
-                                : "hover:bg-gray-100"
-                        }`}
+                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${dashboardTab === "shops"
+                            ? "bg-indigo-100 text-indigo-700"
+                            : "hover:bg-gray-100"
+                            }`}
                     >
                         <Store />
                         View Shops
                     </button>
 
-                    {/* ✅ Property Management */}
                     <button
                         onClick={() => setDashboardTab("property")}
-                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${
-                            dashboardTab === "property"
-                                ? "bg-indigo-100 text-indigo-700"
-                                : "hover:bg-gray-100"
-                        }`}
+                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${dashboardTab === "property"
+                            ? "bg-indigo-100 text-indigo-700"
+                            : "hover:bg-gray-100"
+                            }`}
                     >
                         <Home />
                         Property Management
@@ -112,22 +97,13 @@ const DashboardPage = () => {
 
                 </nav>
             </div>
-
-            {/* ================= Content ================= */}
             <div className="lg:col-span-3 bg-white shadow-xl rounded-xl p-6">
-
                 {dashboardTab === "bookings" && <h2 className="text-xl font-bold">My Bookings</h2>}
-
                 {dashboardTab === "users" && <UserManage />}
-
                 {dashboardTab === "request" && <h2 className="text-xl font-bold">Raise Request</h2>}
-
                 {dashboardTab === "houses" && <h2 className="text-xl font-bold">Houses</h2>}
-
                 {dashboardTab === "shops" && <h2 className="text-xl font-bold">Shops</h2>}
-
-                {dashboardTab === "property" && <PropertyManagePage/>}
-
+                {dashboardTab === "property" && <PropertyManage />}
             </div>
         </div>
     );

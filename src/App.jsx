@@ -6,9 +6,8 @@ import HousePage from "./pages/HousePage";
 import ShopPage from "./pages/ShopPage";
 import ContactPage from "./pages/ContactPage";
 import LoginPage from "./pages/LoginPage";
-import DashboardPage from "./pages/DashboardPage";
+import Dashboard from "./pages/Dashboard";
 
-/* 🔒 Protected Route (NO logic change, only wrapper) */
 const PrivateRoute = ({ children }) => {
     const role = sessionStorage.getItem("role");
     return role ? children : <Navigate to="/login" replace />;
@@ -34,7 +33,7 @@ function App() {
                         path="dashboard"
                         element={
                             <PrivateRoute>
-                                <DashboardPage />
+                                <Dashboard />
                             </PrivateRoute>
                         }
                     />
