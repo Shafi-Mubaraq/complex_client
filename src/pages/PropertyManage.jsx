@@ -32,7 +32,26 @@ const Modal = ({ title, onClose, onSave, children, buttonText, primaryColor }) =
             </div>
         </div>
     </div>
-);
+)
+
+const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, propertyTitle }) => {
+    if (!isOpen) return null;
+    return (
+        <Modal title="Confirm Delete" onClose={onClose} onSave={onConfirm} buttonText="Yes, Delete Property" primaryColor="red">
+            <div className="text-center">
+                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+                    <svg className="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <p className="text-gray-500">
+                    Are you sure you want to delete <span className="font-semibold text-gray-800">{propertyTitle}</span>?
+                </p>
+                <p className="text-sm text-gray-400 mt-1">This action is permanent and cannot be undone.</p>
+            </div>
+        </Modal>
+    );
+};
 
 const PropertyManage = () => {
 
@@ -42,6 +61,8 @@ const PropertyManage = () => {
     const [editData, setEditData] = useState(null);
     const [filterType, setFilterType] = useState("all");
     const [searchTerm, setSearchTerm] = useState("");
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [selectedProperty, setSelectedProperty] = useState(null);
 
     useEffect(() => {
         fetchProperties();
@@ -61,13 +82,15 @@ const PropertyManage = () => {
         }
     };
 
-    const handleDelete = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this property? This action cannot be undone.")) return;
+    const handleDelete = async () => {
         try {
-            await axios.delete(`${apiUrl}/property/delete/${id}`);
-            setProperties((prev) => prev.filter((p) => p._id !== id));
+            await axios.delete(`${apiUrl}/property/delete/${selectedProperty._id}`);
+            setProperties(prev => prev.filter(p => p._id !== selectedProperty._id));
+            setDeleteModalOpen(false);
+            setSelectedProperty(null);
         } catch (err) {
             console.error("Delete error", err);
+            alert("Failed to delete property");
         }
     };
 
@@ -149,7 +172,7 @@ const PropertyManage = () => {
                 <div className="bg-white p-6 shadow-md mb-6 border-t-2 border-gray-200 rounded-b-xl">
                     <div className="flex flex-col md:flex-row gap-4 items-end">
                         <div className="w-full md:w-1/3">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Search Assets:</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Search Assets: : </label>
                             <input
                                 type="text"
                                 placeholder="🔍 Search by Title, Location, or Type..."
@@ -159,7 +182,7 @@ const PropertyManage = () => {
                             />
                         </div>
                         <div className="w-full md:w-1/4">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Property Type:</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Property Type: : </label>
                             <select
                                 className="w-full border-gray-300 focus:border-teal-500 focus:ring-teal-500 p-3 rounded-lg shadow-sm transition duration-150 text-gray-700"
                                 value={filterType}
@@ -216,7 +239,10 @@ const PropertyManage = () => {
                                                 Edit
                                             </button>
                                             <button
-                                                onClick={() => handleDelete(p._id)}
+                                                onClick={() => {
+                                                    setSelectedProperty(p);
+                                                    setDeleteModalOpen(true);
+                                                }}
                                                 className="text-red-600 hover:text-red-800 bg-red-100 px-3 py-1 rounded-md text-xs font-semibold shadow-sm transition hover:shadow-md"
                                             >
                                                 Delete
@@ -242,11 +268,11 @@ const PropertyManage = () => {
                         primaryColor="teal"
                         buttonText={editData._id ? "Update Property" : "Create Listing"}
                     >
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <div className="col-span-1 md:col-span-2">
-                                <label className="block text-xs font-medium text-gray-500 mb-1">Property Type</label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 gap-x-6">
+                            <div className="col-span-1 md:col-span-2 flex flex-col space-y-2">
+                                <label className="text-sm font-semibold text-gray-700 ml-1">Property Type : </label>
                                 <select
-                                    className="w-full h-11 bg-gray-50 border border-gray-300 rounded-lg px-4 text-gray-800 focus:ring-2 focus:ring-teal-500 outline-none transition"
+                                    className="w-full h-11 bg-white border border-gray-300 rounded-lg px-4 text-gray-800 focus:ring-2 focus:ring-teal-500 outline-none transition"
                                     value={editData.propertyType}
                                     onChange={(e) => setEditData({ ...editData, propertyType: e.target.value })}
                                 >
@@ -254,7 +280,6 @@ const PropertyManage = () => {
                                     <option value="shop">Shop</option>
                                 </select>
                             </div>
-
                             {[
                                 ["Title", "title", "text"],
                                 ["Rent (₹)", "rent", "number"],
@@ -262,40 +287,41 @@ const PropertyManage = () => {
                                 ["Area (sqft)", "area", "number"],
                                 ["Location", "location", "text"],
                             ].map(([label, key, type]) => (
-                                <div key={key} className="relative">
+                                <div key={key} className="flex flex-col space-y-2">
+                                    <label
+                                        htmlFor={`prop-${key}`}
+                                        className="text-sm font-semibold text-gray-700 ml-1"
+                                    >
+                                        {label} :
+                                    </label>
                                     <input
                                         type={type}
                                         id={`prop-${key}`}
-                                        className="peer w-full h-12 bg-gray-50 border border-gray-300 rounded-lg px-4 pt-6 pb-2 text-gray-800 placeholder-transparent focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
-                                        placeholder={label}
+                                        className="w-full h-11 bg-white border border-gray-300 rounded-lg px-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
                                         value={editData[key] ?? ""}
                                         onChange={(e) => setEditData({ ...editData, [key]: e.target.value })}
                                     />
-                                    <label
-                                        htmlFor={`prop-${key}`}
-                                        className="absolute left-4 top-1 text-xs text-gray-500 transition-all transform peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:top-1 peer-focus:text-xs peer-focus:text-teal-600 pointer-events-none"
-                                    >
-                                        {label}
-                                    </label>
                                 </div>
                             ))}
 
-                            <div className="relative">
+                            {/* Availability Status Select */}
+                            <div className="flex flex-col space-y-2">
+                                <label className="text-sm font-semibold text-gray-700 ml-1">Availability Status : </label>
                                 <select
-                                    className="peer w-full h-12 bg-gray-50 border border-gray-300 rounded-lg px-4 pt-5 pb-1 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
+                                    className="w-full h-11 bg-white border border-gray-300 rounded-lg px-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
                                     value={editData.isAvailable.toString()}
                                     onChange={(e) => setEditData({ ...editData, isAvailable: e.target.value === "true" })}
                                 >
                                     <option value="true">Available</option>
                                     <option value="false">Occupied / Not Available</option>
                                 </select>
-                                <label className="absolute left-4 top-1 text-xs text-gray-500">Availability Status</label>
                             </div>
 
-                            <div className="col-span-1 md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Amenities (Comma separated)</label>
+                            {/* Amenities Textarea */}
+                            <div className="col-span-1 md:col-span-2 flex flex-col space-y-2">
+                                <label className="text-sm font-semibold text-gray-700 ml-1">Amenities : </label>
                                 <textarea
-                                    className="w-full bg-gray-50 border border-gray-300 rounded-lg p-3 text-gray-800 focus:ring-2 focus:ring-teal-500 outline-none transition"
+                                    className="w-full bg-white border border-gray-300 rounded-lg p-3 text-gray-800 focus:ring-2 focus:ring-teal-500 outline-none transition"
                                     rows="2"
                                     value={editData.amenities.join(", ")}
                                     placeholder="e.g. Parking, WiFi, Security"
@@ -303,8 +329,9 @@ const PropertyManage = () => {
                                 />
                             </div>
 
-                            <div className="col-span-1 md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Property Images</label>
+                            {/* Image Upload Section */}
+                            <div className="col-span-1 md:col-span-2 flex flex-col space-y-2">
+                                <label className="text-sm font-semibold text-gray-700 ml-1">Property Images : </label>
                                 <input
                                     type="file"
                                     multiple
@@ -320,10 +347,10 @@ const PropertyManage = () => {
                                         }))).then(imgs => setEditData({ ...editData, images: imgs }));
                                     }}
                                 />
-                                <div className="flex flex-wrap mt-3 gap-3">
+                                <div className="flex flex-wrap mt-2 gap-3">
                                     {editData.images?.map((img, idx) => (
                                         <div key={idx} className="relative group">
-                                            <img src={img} alt="preview" className="w-20 h-20 object-cover rounded-lg border-2 border-gray-200 shadow-sm" />
+                                            <img src={img} alt="preview" className="w-20 h-20 object-cover rounded-lg border border-gray-200 shadow-sm" />
                                         </div>
                                     ))}
                                 </div>
@@ -331,6 +358,17 @@ const PropertyManage = () => {
                         </div>
                     </Modal>
                 )}
+
+                <DeleteConfirmationModal
+                    isOpen={deleteModalOpen}
+                    onClose={() => {
+                        setDeleteModalOpen(false);
+                        setSelectedProperty(null);
+                    }}
+                    onConfirm={handleDelete}
+                    propertyTitle={selectedProperty?.title}
+                />
+
             </div>
         </div>
     );

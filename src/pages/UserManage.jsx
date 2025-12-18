@@ -1,19 +1,13 @@
 import React, { useEffect, useState } from "react";
 
 const INITIAL_USER = {
-    fullName: "",
-    email: "",
-    password: "",
-    aadhar: "",
-    mobile: "",
-    additionalNumber: "",
-    city: "",
-    state: ""
+    fullName: "", email: "", password: "", aadhar: "",
+    mobile: "", additionalNumber: "", city: "", state: ""
 };
 
 const Modal = ({ title, onClose, onSave, children, buttonText, primaryColor }) => (
     <div className="fixed inset-0 bg-gray-900 bg-opacity-70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg transform max-h-[90vh] overflow-hidden flex flex-col transition-all duration-300 ease-in-out">
+        <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl transform max-h-[90vh] overflow-hidden flex flex-col transition-all duration-300 ease-in-out">
             <div className={`p-5 border-b flex justify-between items-center bg-white border-${primaryColor}-600`}>
                 <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
                 <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition">
@@ -22,9 +16,7 @@ const Modal = ({ title, onClose, onSave, children, buttonText, primaryColor }) =
                     </svg>
                 </button>
             </div>
-
             <div className="p-6 overflow-y-auto">{children}</div>
-
             <div className="p-5 border-t bg-gray-50 flex justify-end space-x-3">
                 <button
                     className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium px-4 py-2 rounded-lg transition"
@@ -41,7 +33,36 @@ const Modal = ({ title, onClose, onSave, children, buttonText, primaryColor }) =
             </div>
         </div>
     </div>
-);
+)
+
+const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, userName }) => {
+
+    if (!isOpen) return null;
+
+    return (
+        <Modal
+            title="Confirm Delete"
+            onClose={onClose}
+            onSave={onConfirm}
+            buttonText="Yes, Delete User"
+            primaryColor="red"
+        >
+            <div className="text-center">
+                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+                    <svg className="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <p className="text-gray-500">
+                    Are you sure you want to delete <span className="font-semibold text-gray-800">{userName}</span> ?
+                </p>
+                <p className="text-sm text-gray-400 mt-1">
+                    This action is permanent and cannot be undone.
+                </p>
+            </div>
+        </Modal>
+    )
+}
 
 const UserManage = () => {
 
@@ -50,7 +71,7 @@ const UserManage = () => {
     const [editUser, setEditUser] = useState(null);
     const [showAddUser, setShowAddUser] = useState(false);
     const [form, setForm] = useState(INITIAL_USER);
-
+    const [userToDelete, setUserToDelete] = useState(null);
     const apiUrl = import.meta.env.VITE_API_URL;
 
     const loadUsers = async () => {
@@ -67,16 +88,21 @@ const UserManage = () => {
         loadUsers();
     }, []);
 
-    const deleteUser = async (id) => {
-        if (!confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
+    const handleDeleteClick = (user) => {
+        setUserToDelete(user);
+    };
+
+    const confirmDelete = async () => {
+        if (!userToDelete) return;
         try {
-            await fetch(`${apiUrl}/api/userManage/delete/${id}`, { method: "DELETE" });
+            await fetch(`${apiUrl}/api/userManage/delete/${userToDelete._id}`, { method: "DELETE" });
+            setUserToDelete(null);
             loadUsers();
         } catch (err) {
             alert("Failed to delete user.");
-            console.error('Error in delting user : ', err)
+            console.error('Error in deleting user : ', err);
         }
-    };
+    }
 
     const saveEdit = async () => {
         try {
@@ -205,7 +231,7 @@ const UserManage = () => {
                                                 Edit
                                             </button>
                                             <button
-                                                onClick={() => deleteUser(u._id)}
+                                                onClick={() => handleDeleteClick(u)}
                                                 className="text-red-600 hover:text-red-800 bg-red-100 px-3 py-1 rounded-md text-xs font-semibold shadow-sm transition hover:shadow-md"
                                             >
                                                 Delete
@@ -234,11 +260,17 @@ const UserManage = () => {
                         primaryColor="teal"
                         buttonText="Save Changes"
                     >
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 gap-x-6">
                             {Object.keys(INITIAL_USER)
                                 .filter(key => key !== "password")
                                 .map(key => (
-                                    <div key={key} className="relative">
+                                    <div key={key} className="flex flex-col space-y-2">
+                                        <label
+                                            htmlFor={`edit-${key}`}
+                                            className="text-sm font-medium text-gray-700"
+                                        >
+                                            {key.replace(/([A-Z])/g, " $1").replace(/^./, str => str.toUpperCase())} :
+                                        </label>
                                         <input
                                             type={
                                                 key === "email"
@@ -249,17 +281,10 @@ const UserManage = () => {
                                             }
                                             name={key}
                                             id={`edit-${key}`}
-                                            className="peer w-full h-12 bg-gray-50 border border-gray-300 rounded-lg px-4 pt-6 pb-2 text-gray-800 placeholder-transparent focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition duration-150"
+                                            className="w-full h-10 bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition duration-150"
                                             value={editUser[key] || ""}
-                                            placeholder={key}
                                             onChange={(e) => handleFormChange(e, editUser, setEditUser)}
                                         />
-                                        <label
-                                            htmlFor={`edit-${key}`}
-                                            className="absolute left-4 top-1 text-xs text-gray-500 transition-all transform peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:top-1 peer-focus:text-xs peer-focus:text-teal-600 pointer-events-none"
-                                        >
-                                            {key.replace(/([A-Z])/g, " $1").replace(/^./, str => str.toUpperCase())}
-                                        </label>
                                     </div>
                                 ))}
                         </div>
@@ -277,9 +302,16 @@ const UserManage = () => {
                         primaryColor="green"
                         buttonText="Create Account"
                     >
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 gap-x-6">
                             {Object.keys(INITIAL_USER).map(key => (
-                                <div key={key} className="relative">
+                                <div key={key} className="flex flex-col space-y-2">
+                                    <label
+                                        htmlFor={`add-${key}`}
+                                        className="text-sm font-semibold text-gray-700 ml-1"
+                                    >
+                                        {key.replace(/([A-Z])/g, " $1").replace(/^./, str => str.toUpperCase())} :
+                                        {key !== "additionalNumber" && <span className="text-red-500 ml-1">*</span>}
+                                    </label>
                                     <input
                                         type={
                                             key === "email"
@@ -292,23 +324,24 @@ const UserManage = () => {
                                         }
                                         name={key}
                                         id={`add-${key}`}
-                                        className="peer w-full h-12 bg-gray-50 border border-gray-300 rounded-lg px-4 pt-6 pb-2 text-gray-800 placeholder-transparent focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-150"
+                                        className="w-full h-11 bg-white border border-gray-300 rounded-lg px-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-150"
                                         value={form[key] || ""}
-                                        placeholder={key}
                                         onChange={(e) => handleFormChange(e, form, setForm)}
                                         required={key !== "additionalNumber"}
                                     />
-                                    <label
-                                        htmlFor={`add-${key}`}
-                                        className="absolute left-4 top-1 text-xs text-gray-500 transition-all transform peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:top-1 peer-focus:text-xs peer-focus:text-green-600 pointer-events-none"
-                                    >
-                                        {key.replace(/([A-Z])/g, " $1").replace(/^./, str => str.toUpperCase())}
-                                    </label>
                                 </div>
                             ))}
                         </div>
                     </Modal>
                 )}
+
+                <DeleteConfirmationModal
+                    isOpen={!!userToDelete}
+                    onClose={() => setUserToDelete(null)}
+                    onConfirm={confirmDelete}
+                    userName={userToDelete?.fullName}
+                />
+
             </div>
         </div>
     );
