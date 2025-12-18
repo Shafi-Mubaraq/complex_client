@@ -74,6 +74,7 @@ const ShopPage = () => {
         : 'http://localhost:5000';
 
     useEffect(() => {
+
         const fetchData = async () => {
             setLoading(true);
             setError(null);
