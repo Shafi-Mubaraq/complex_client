@@ -78,7 +78,7 @@ const ShopPage = () => {
             setLoading(true);
             setError(null);
             try {
-                const response = await axios.get(`${apiUrl}/api/shop/fetchData`);
+                const response = await axios.get(`${apiUrl}/shop/fetchData`);
 
                 if (Array.isArray(response.data) && response.data.length > 0) {
                     setProperties(response.data);
@@ -94,7 +94,7 @@ const ShopPage = () => {
                 setError("⚠️ Could not load live commercial listings. Showing curated local examples.");
                 setProperties(initialShopData);
             } finally {
-                setTimeout(() => setLoading(false), 500); 
+                setTimeout(() => setLoading(false), 500);
             }
         };
 
@@ -102,7 +102,7 @@ const ShopPage = () => {
     }, [apiUrl]);
 
     const theme = {
-        bg: 'bg-white', 
+        bg: 'bg-white',
         textPrimary: 'text-gray-900',
         brandAccent: 'text-indigo-600',
     };
@@ -113,10 +113,10 @@ const ShopPage = () => {
             <section className={`py-20 px-4 min-h-[90vh] ${theme.bg}`}>
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-16">
-                         <ShoppingBagIcon className="w-12 h-12 mx-auto text-indigo-500 mb-4 animate-bounce" />
+                        <ShoppingBagIcon className="w-12 h-12 mx-auto text-indigo-500 mb-4 animate-bounce" />
                         <h2 className={`text-3xl font-bold ${theme.textPrimary}`}>Loading Commercial Spaces...</h2>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                         <SkeletonCard />
                         <SkeletonCard />
@@ -144,12 +144,12 @@ const ShopPage = () => {
 
                 {/* Header - Premium Design (Adopted from HousePage) */}
                 <div className="text-center mb-4">
-                    <SparklesIcon className="w-10 h-10 mx-auto text-indigo-500 mb-2"/>
+                    <SparklesIcon className="w-10 h-10 mx-auto text-indigo-500 mb-2" />
                 </div>
                 <h1 className={`text-5xl sm:text-6xl font-extrabold ${theme.textPrimary} mb-4 text-center tracking-tight leading-tight`}>
-                    Premium Business <br className="hidden sm:inline-block"/>
+                    Premium Business <br className="hidden sm:inline-block" />
                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-                       Commercial Spaces
+                        Commercial Spaces
                     </span>
                 </h1>
 
@@ -160,11 +160,11 @@ const ShopPage = () => {
                 {/* Sticky Filter Bar Placeholder (Adopted from HousePage) */}
                 <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-sm border-y border-gray-200 py-4 mb-10 shadow-sm">
                     <div className="flex justify-between items-center max-w-6xl mx-auto px-4">
-                         <span className="text-lg font-bold text-gray-800">{properties.length} Available Units</span>
-                         <button className="flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-lg hover:bg-indigo-100 transition">
-                            <MapPinIcon className="w-5 h-5"/>
+                        <span className="text-lg font-bold text-gray-800">{properties.length} Available Units</span>
+                        <button className="flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-lg hover:bg-indigo-100 transition">
+                            <MapPinIcon className="w-5 h-5" />
                             View on Map
-                         </button>
+                        </button>
                     </div>
                 </div>
 
@@ -192,9 +192,9 @@ const ShopPage = () => {
                             location={property.location}
                             // Custom labels for commercial use
                             feature1Label="Suitability"
-                            feature1Value={property.suitability || "Commercial"} 
+                            feature1Value={property.suitability || "Commercial"}
                             feature2Label="Floor"
-                            feature2Value={property.floor || "NA"} 
+                            feature2Value={property.floor || "NA"}
                         />
                     ))}
                 </div>

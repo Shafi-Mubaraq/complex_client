@@ -56,6 +56,7 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, propertyTitle }) 
 const PropertyManage = () => {
 
     const apiUrl = import.meta.env.VITE_API_URL;
+    console.log(apiUrl)
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editData, setEditData] = useState(null);
