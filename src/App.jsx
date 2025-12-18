@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import OverLayout from "./layouts/OverLayout";
 import HousePage from "./pages/HousePage";
@@ -7,19 +7,37 @@ import ShopPage from "./pages/ShopPage";
 import ContactPage from "./pages/ContactPage";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
-       
-function App() {
 
+/* 🔒 Protected Route (NO logic change, only wrapper) */
+const PrivateRoute = ({ children }) => {
+    const role = sessionStorage.getItem("role");
+    return role ? children : <Navigate to="/login" replace />;
+};
+
+function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/*" element={<OverLayout />} >
+                <Route path="/*" element={<OverLayout />}>
+
+                    {/* Default Route */}
+                    <Route index element={<Navigate to="homepage" replace />} />
+
                     <Route path="homepage" element={<HomePage />} />
                     <Route path="houses" element={<HousePage />} />
                     <Route path="shops" element={<ShopPage />} />
                     <Route path="contact" element={<ContactPage />} />
-                    <Route path="dashboard" element={<DashboardPage />} />
                     <Route path="login" element={<LoginPage />} />
+
+                    {/* 🔐 Protected Dashboard */}
+                    <Route
+                        path="dashboard"
+                        element={
+                            <PrivateRoute>
+                                <DashboardPage />
+                            </PrivateRoute>
+                        }
+                    />
                 </Route>
             </Routes>
         </Router>

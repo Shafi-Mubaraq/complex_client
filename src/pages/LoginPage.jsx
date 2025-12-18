@@ -3,6 +3,7 @@ import CustomInput from "../components/Common/CustomInput";
 import { FaLock, FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
 import axios from "axios";
 import { ArrowRight, LogIn } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const THEME = {
     ACCENT: "bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-500/40 text-white",
@@ -24,13 +25,12 @@ const SignInModal = ({ onClose, onSwitchToSignUp }) => {
     const [showPassword, setShowPassword] = useState(false);
 
     const mobileInputRef = useRef(null);
+    const navigate = useNavigate(); // ✅ NEW
 
     const apiUrl = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
-        if (mobileInputRef.current) {
-            mobileInputRef.current.focus();
-        }
+        mobileInputRef.current?.focus();
     }, []);
 
     const handleChange = (e) => {
@@ -50,42 +50,52 @@ const SignInModal = ({ onClose, onSwitchToSignUp }) => {
 
         try {
             const res = await axios.post(`${apiUrl}/api/auth/signin`, form);
-            console.log(res)
 
             if (res.status === 200) {
-
                 const { token, fullName, mobile, role } = res.data;
 
-                // ✅ Store user data in localStorage
+                // ✅ SAME STORAGE LOGIC
                 sessionStorage.setItem("token", token);
                 sessionStorage.setItem("fullName", fullName);
                 sessionStorage.setItem("mobile", mobile);
                 sessionStorage.setItem("role", role);
 
-                alert("Sign in successful!");
-                }
+                // ✅ ONLY ADDITION
+                navigate("/dashboard");
+            }
 
         } catch (err) {
-            const errorMessage =
-                err.response?.data?.message || "Invalid mobile or password.";
-                console.log(err)
-            setError(errorMessage);
+            setError(
+                err.response?.data?.message || "Invalid mobile or password."
+            );
         }
 
         setLoading(false);
     };
 
     return (
-        <div className="flex justify-center mt-8" role="dialog" aria-modal="true" aria-labelledby="login-title">
+        <div
+            className="flex justify-center mt-8"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="login-title"
+        >
             <div className="relative max-w-md w-full p-6 bg-white rounded-xl shadow-2xl border border-gray-100">
 
+                {/* HEADER */}
                 <div className="text-center mb-5">
-                    <h2 id="login-title" className="text-3xl mt-3 font-extrabold text-gray-900 tracking-tight mb-3">
+                    <h2
+                        id="login-title"
+                        className="text-3xl mt-3 font-extrabold text-gray-900 tracking-tight mb-3"
+                    >
                         Secure Login
                     </h2>
-                    <p className="text-sm text-gray-500 mt-1">Access your dashboard.</p>
+                    <p className="text-sm text-gray-500 mt-1">
+                        Access your dashboard.
+                    </p>
                 </div>
 
+                {/* FORM */}
                 <form className="space-y-6" onSubmit={loginUser}>
                     <CustomInput
                         ref={mobileInputRef}
@@ -113,14 +123,25 @@ const SignInModal = ({ onClose, onSwitchToSignUp }) => {
                             className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
                             onClick={() => setShowPassword(!showPassword)}
                         >
-                            {showPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
+                            {showPassword ? (
+                                <FaEyeSlash className="w-5 h-5" />
+                            ) : (
+                                <FaEye className="w-5 h-5" />
+                            )}
                         </button>
                     </div>
 
-                    {error && <p className="text-sm text-red-500 font-medium -mt-2">{error}</p>}
+                    {error && (
+                        <p className="text-sm text-red-500 font-medium -mt-2">
+                            {error}
+                        </p>
+                    )}
 
                     <div className="text-right -mt-2">
-                        <a href="#" className="text-xs text-gray-500 hover:text-blue-600 transition">
+                        <a
+                            href="#"
+                            className="text-xs text-gray-500 hover:text-blue-600 transition"
+                        >
                             Forgot Password?
                         </a>
                     </div>
@@ -130,15 +151,22 @@ const SignInModal = ({ onClose, onSwitchToSignUp }) => {
                         disabled={loading}
                         className={`w-full ${THEME.ACCENT} flex items-center justify-center gap-2 py-2 rounded-lg font-semibold text-base transition duration-300 disabled:opacity-70 disabled:cursor-not-allowed`}
                     >
-                        {loading ? <LoadingSpinner /> : <>
-                            <LogIn className="w-4 h-4" />
-                            Sign In
-                        </>}
+                        {loading ? (
+                            <LoadingSpinner />
+                        ) : (
+                            <>
+                                <LogIn className="w-4 h-4" />
+                                Sign In
+                            </>
+                        )}
                     </button>
                 </form>
 
+                {/* FOOTER */}
                 <div className="mt-6 pt-4 border-t border-gray-200 text-center">
-                    <p className="text-xs text-gray-600">Not registered yet?</p>
+                    <p className="text-xs text-gray-600">
+                        Not registered yet?
+                    </p>
                     <button
                         type="button"
                         className={`${THEME.LINK} flex items-center justify-center gap-1 mx-auto mt-1 text-sm`}
@@ -149,16 +177,26 @@ const SignInModal = ({ onClose, onSwitchToSignUp }) => {
                     </button>
                 </div>
 
+                {/* CLOSE BUTTON */}
                 <button
                     type="button"
                     className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 transition p-1 rounded-full hover:bg-gray-100"
                     onClick={onClose}
                 >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M6 18L18 6M6 6l12 12"
+                        />
                     </svg>
                 </button>
-
             </div>
         </div>
     );
