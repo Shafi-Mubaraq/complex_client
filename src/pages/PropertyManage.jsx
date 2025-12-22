@@ -72,10 +72,10 @@ const PropertyManage = () => {
     const fetchProperties = async () => {
         try {
             const [housesRes, shopsRes] = await Promise.all([
-                axios.get(`${apiUrl}/house/fetchData`),
-                axios.get(`${apiUrl}/shop/fetchData`),
+                axios.get(`${apiUrl}/api/house/fetchData`),
+                axios.get(`${apiUrl}/api/shop/fetchData`),
             ]);
-            setProperties([...housesRes.data, ...shopsRes.data]);
+                setProperties([...housesRes.data, ...shopsRes.data]);
         } catch (err) {
             console.error("Fetch error", err);
         } finally {
@@ -85,7 +85,7 @@ const PropertyManage = () => {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`${apiUrl}/property/delete/${selectedProperty._id}`);
+            await axios.delete(`${apiUrl}/api/property/delete/${selectedProperty._id}`);
             setProperties(prev => prev.filter(p => p._id !== selectedProperty._id));
             setDeleteModalOpen(false);
             setSelectedProperty(null);
@@ -104,15 +104,18 @@ const PropertyManage = () => {
                 area: Number(editData.area),
                 amenities: editData.amenities.map((a) => a.trim()).filter(Boolean),
                 images: editData.images,
+                floor: editData.floor,
+                doorNumber: editData.doorNumber,
+
             };
 
             if (editData._id) {
-                const res = await axios.put(`${apiUrl}/property/update/${editData._id}`, payload);
+                const res = await axios.put(`${apiUrl}/api/property/update/${editData._id}`, payload);
                 setProperties((prev) =>
                     prev.map((p) => (p._id === res.data.property._id ? res.data.property : p))
                 );
             } else {
-                const res = await axios.post(`${apiUrl}/property/create`, payload);
+                const res = await axios.post(`${apiUrl}/api/property/create`, payload);
                 setProperties((prev) => [...prev, res.data.property]);
             }
             setEditData(null);
@@ -156,6 +159,8 @@ const PropertyManage = () => {
                                     propertyType: "house",
                                     rent: "",
                                     deposit: "",
+                                    floor: "",
+                                    doorNumber: "",
                                     area: "",
                                     location: "",
                                     amenities: [],
@@ -205,8 +210,15 @@ const PropertyManage = () => {
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Title</th>
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Type</th>
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Pricing (Rent/Dep)</th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                                    Floor
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
+                                    Door No
+                                </th>
+
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Area (sqft)</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Location</th>
+                                {/* <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Location</th> */}
                                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
                                 <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
                             </tr>
@@ -224,9 +236,13 @@ const PropertyManage = () => {
                                         <td className="px-6 py-4 text-sm text-gray-600">
                                             <div className="font-semibold text-gray-800">₹{p.rent}</div>
                                             <div className="text-xs text-gray-400">Dep: ₹{p.deposit}</div>
+                                            
                                         </td>
+
+                                                <td className="px-6 py-4 text-sm text-gray-600">{p.floor}</td>
+                                                <td className="px-6 py-4 text-sm text-gray-600">{p.doorNumber}</td>
                                         <td className="px-6 py-4 text-sm text-gray-600">{p.area}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">{p.location}</td>
+                                        {/* <td className="px-6 py-4 text-sm text-gray-600">{p.location}</td> */}
                                         <td className="px-6 py-4 text-sm">
                                             <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${p.isAvailable ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                                                 {p.isAvailable ? "Available" : "Occupied"}
@@ -253,7 +269,7 @@ const PropertyManage = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="7" className="px-6 py-6 text-center text-gray-500 italic">No properties matching your criteria.</td>
+                                    <td colSpan="9" className="px-6 py-6 text-center text-gray-500 italic">No properties matching your criteria.</td>
                                 </tr>
                             )}
                         </tbody>
@@ -285,6 +301,8 @@ const PropertyManage = () => {
                                 ["Title", "title", "text"],
                                 ["Rent (₹)", "rent", "number"],
                                 ["Deposit (₹)", "deposit", "number"],
+                                ["Floor", "floor", "text"],
+                                ["Door Number", "doorNumber", "text"],
                                 ["Area (sqft)", "area", "number"],
                                 ["Location", "location", "text"],
                             ].map(([label, key, type]) => (

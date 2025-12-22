@@ -8,19 +8,21 @@ const PropertyCard = ({
     title,
     description = "Premium property details available upon request.",
     // Commercial Props
-    price, 
-    status, 
+    price,
+    status,
     sqft,
     // Residential Props
-    rent, 
-    area, 
-    isAvailable, 
+    rent,
+    area,
+    isAvailable,
     deposit,
 
     // Generic/Mapped Props
-    beds, 
-    baths, 
-    location = "TNS Complex", 
+    beds,
+    baths,
+    location = "TNS Complex",
+     onActionClick
+    
 }) => {
 
     // --- 1. HARMONIZE PROPS ---
@@ -31,14 +33,14 @@ const PropertyCard = ({
     // --- 2. STATUS LOGIC ---
     const currentStatus = finalStatus || 'Unknown';
     let statusConfig = { text: currentStatus.toUpperCase(), icon: FaClock, color: 'bg-gray-500', textColor: 'text-white' };
-    
+
     switch (currentStatus.toLowerCase()) {
         case 'available':
             statusConfig = { text: 'AVAILABLE', icon: FaCheckCircle, color: 'bg-green-600', textColor: 'text-white' };
             break;
         case 'leased':
         case 'sold out':
-            statusConfig = { text: 'LEASED', icon: FaTimesCircle, color: 'bg-red-600', textColor: 'text-white' };
+            statusConfig = { text: 'Occupide', icon: FaTimesCircle, color: 'bg-red-600', textColor: 'text-white' };
             break;
         case 'pending':
             statusConfig = { text: 'PENDING', icon: FaClock, color: 'bg-yellow-500', textColor: 'text-gray-900' };
@@ -46,24 +48,25 @@ const PropertyCard = ({
         default:
             break;
     }
-    
+
     // --- 3. FORMATTING & TYPE CHECK ---
     const isCommercial = price || isNaN(beds) || isNaN(baths) || (typeof beds === 'string' && isNaN(parseInt(beds)));
-    const ctaText = currentStatus === 'Available' ? (isCommercial ? 'View Lease Details' : 'Book a Tour') : 'Join Waitlist';
+    const ctaText = currentStatus === 'Available' ? (isCommercial ? 'View Shops Details' : 'View House Details') : 'Boooked';
 
     const formattedSqft = finalArea ? finalArea.toLocaleString('en-US') : null;
 
     // Use specific formatting for INR (Residential - number type) or standard for commercial (string/price prop)
-    const formattedPrice = typeof finalPrice === 'number' 
+    const formattedPrice = typeof finalPrice === 'number'
         ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(finalPrice)
         : finalPrice;
-    
-    const formattedDeposit = typeof deposit === 'number' 
+
+    const formattedDeposit = typeof deposit === 'number'
         ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(deposit)
         : null;
 
     // Determine the Property Category label
     const categoryLabel = isCommercial ? (beds || 'Commercial') : 'Residential Home';
+    
 
 
     return (
@@ -85,7 +88,7 @@ const PropertyCard = ({
 
                 {/* Top Row: Price, Status, Category */}
                 <div className="flex justify-between items-start mb-4 border-b border-gray-100 pb-4">
-                    
+
                     {/* Price Block */}
                     <div className="flex flex-col">
                         <p className="text-sm font-medium text-gray-500 uppercase leading-none">
@@ -121,7 +124,7 @@ const PropertyCard = ({
 
                 {/* Feature Row (Editorial Divider Style) */}
                 <div className="grid grid-cols-3 gap-3 border-y border-gray-200 py-3 mb-6 text-gray-700 text-center">
-                    
+
                     {/* Area/Sqft */}
                     {formattedSqft && (
                         <div className="flex flex-col items-center">
@@ -136,7 +139,7 @@ const PropertyCard = ({
                             {/* Suitability (beds slot) */}
                             {beds && (
                                 <div className="flex flex-col items-center border-l border-r border-gray-200">
-                                    <FaClipboardList className="w-5 h-5 text-indigo-500 mb-1" /> 
+                                    <FaClipboardList className="w-5 h-5 text-indigo-500 mb-1" />
                                     <span className="text-sm font-semibold">{beds}</span>
                                     <span className="text-xs text-gray-400">Use</span>
                                 </div>
@@ -144,7 +147,7 @@ const PropertyCard = ({
                             {/* Floor (baths slot) */}
                             {baths && (
                                 <div className="flex flex-col items-center">
-                                    <FaBuilding className="w-5 h-5 text-indigo-500 mb-1" /> 
+                                    <FaBuilding className="w-5 h-5 text-indigo-500 mb-1" />
                                     <span className="text-sm font-semibold">{baths}</span>
                                     <span className="text-xs text-gray-400">Floor</span>
                                 </div>
@@ -181,11 +184,18 @@ const PropertyCard = ({
                     </span>
                     <button
                         className="w-full text-white flex items-center justify-center gap-3 text-base font-semibold transition rounded-lg py-3 px-4 bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-500/30"
-                        onClick={() => console.log(`Viewing details for ${title}`)}
+                        onClick={() => onActionClick({
+                            type: ctaText === "Join Waitlist" ? "waitlist" : "view",
+                            data: {
+                                src, title, description, rent, deposit, area,
+                                location, beds, baths, isAvailable
+                            }
+                        })}
                     >
                         <span>{ctaText}</span>
                         <FaArrowRight className="w-3 h-3 transition duration-200 group-hover:translate-x-1" />
                     </button>
+
                 </div>
             </div>
         </div>
