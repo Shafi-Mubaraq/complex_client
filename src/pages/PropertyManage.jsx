@@ -65,6 +65,8 @@ const PropertyManage = () => {
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [selectedProperty, setSelectedProperty] = useState(null);
     const [selectedFiles, setSelectedFiles] = useState([]);
+    const [existingImages, setExistingImages] = useState([]);
+
 
 
     useEffect(() => {
@@ -96,12 +98,11 @@ const PropertyManage = () => {
             alert("Failed to delete property");
         }
     };
-
     const handleSave = async () => {
         try {
             const formData = new FormData();
 
-            // append text fields
+            // ✅ append ONLY scalar fields
             formData.append("title", editData.title);
             formData.append("propertyType", editData.propertyType);
             formData.append("rent", editData.rent);
@@ -112,10 +113,15 @@ const PropertyManage = () => {
             formData.append("location", editData.location);
             formData.append("isAvailable", editData.isAvailable);
 
-            // amenities
-            formData.append("amenities", editData.amenities.join(","));
+            // ✅ amenities ONLY ONCE
+            formData.append(
+                "amenities",
+                Array.isArray(editData.amenities)
+                    ? editData.amenities.join(",")
+                    : ""
+            );
 
-            // 🔴 VERY IMPORTANT → append ALL files
+            // ✅ append ALL new images
             selectedFiles.forEach((file) => {
                 formData.append("images", file);
             });
@@ -144,10 +150,12 @@ const PropertyManage = () => {
                 setProperties((prev) => [...prev, res.data.property]);
             }
 
+            // cleanup
             setEditData(null);
             setSelectedFiles([]);
+            setExistingImages([]);
         } catch (err) {
-            console.error(err);
+            console.error("SAVE ERROR:", err.response?.data || err.message);
             alert("Save failed");
         }
     };
@@ -279,11 +287,16 @@ const PropertyManage = () => {
                                         </td>
                                         <td className="px-6 py-4 text-center text-sm font-medium space-x-2">
                                             <button
-                                                onClick={() => setEditData(p)}
-                                                className="text-teal-600 hover:text-teal-800 bg-teal-100 px-3 py-1 rounded-md text-xs font-semibold shadow-sm transition hover:shadow-md"
+                                                onClick={() => {
+                                                    setEditData(p);
+                                                    setExistingImages(p.images || []);
+                                                    setSelectedFiles([]);
+                                                }}
+                                                className="text-teal-600 hover:text-teal-800 bg-teal-100 px-3 py-1 rounded-md text-xs font-semibold"
                                             >
                                                 Edit
                                             </button>
+
                                             <button
                                                 onClick={() => {
                                                     setSelectedProperty(p);
@@ -395,18 +408,20 @@ const PropertyManage = () => {
                                     }}
                                 />
                                 <div className="flex flex-wrap gap-3 mt-3">
-                                    {selectedFiles.map((file, idx) => (
+                                    {/* Existing images */}
+                                    {existingImages.map((img, idx) => (
                                         <img
-                                            key={idx}
-                                            src={URL.createObjectURL(file)}
+                                            key={`old-${idx}`}
+                                            src={`${apiUrl}${img}`}
                                             className="w-20 h-20 rounded-lg object-cover border"
                                         />
                                     ))}
 
-                                    {editData.images?.map((img, idx) => (
+                                    {/* Newly selected images */}
+                                    {selectedFiles.map((file, idx) => (
                                         <img
-                                            key={idx}
-                                            src={`${apiUrl}${img}`}
+                                            key={`new-${idx}`}
+                                            src={URL.createObjectURL(file)}
                                             className="w-20 h-20 rounded-lg object-cover border"
                                         />
                                     ))}
