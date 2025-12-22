@@ -64,6 +64,8 @@ const PropertyManage = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [selectedProperty, setSelectedProperty] = useState(null);
+    const [selectedFiles, setSelectedFiles] = useState([]);
+
 
     useEffect(() => {
         fetchProperties();
@@ -75,7 +77,7 @@ const PropertyManage = () => {
                 axios.get(`${apiUrl}/api/house/fetchData`),
                 axios.get(`${apiUrl}/api/shop/fetchData`),
             ]);
-                setProperties([...housesRes.data, ...shopsRes.data]);
+            setProperties([...housesRes.data, ...shopsRes.data]);
         } catch (err) {
             console.error("Fetch error", err);
         } finally {
@@ -97,33 +99,59 @@ const PropertyManage = () => {
 
     const handleSave = async () => {
         try {
-            const payload = {
-                ...editData,
-                rent: Number(editData.rent),
-                deposit: Number(editData.deposit),
-                area: Number(editData.area),
-                amenities: editData.amenities.map((a) => a.trim()).filter(Boolean),
-                images: editData.images,
-                floor: editData.floor,
-                doorNumber: editData.doorNumber,
+            const formData = new FormData();
 
-            };
+            // append text fields
+            formData.append("title", editData.title);
+            formData.append("propertyType", editData.propertyType);
+            formData.append("rent", editData.rent);
+            formData.append("deposit", editData.deposit);
+            formData.append("floor", editData.floor);
+            formData.append("doorNumber", editData.doorNumber);
+            formData.append("area", editData.area);
+            formData.append("location", editData.location);
+            formData.append("isAvailable", editData.isAvailable);
+
+            // amenities
+            formData.append("amenities", editData.amenities.join(","));
+
+            // 🔴 VERY IMPORTANT → append ALL files
+            selectedFiles.forEach((file) => {
+                formData.append("images", file);
+            });
+
+            let res;
 
             if (editData._id) {
-                const res = await axios.put(`${apiUrl}/api/property/update/${editData._id}`, payload);
+                res = await axios.put(
+                    `${apiUrl}/api/property/update/${editData._id}`,
+                    formData,
+                    { headers: { "Content-Type": "multipart/form-data" } }
+                );
+
                 setProperties((prev) =>
-                    prev.map((p) => (p._id === res.data.property._id ? res.data.property : p))
+                    prev.map((p) =>
+                        p._id === res.data.property._id ? res.data.property : p
+                    )
                 );
             } else {
-                const res = await axios.post(`${apiUrl}/api/property/create`, payload);
+                res = await axios.post(
+                    `${apiUrl}/api/property/create`,
+                    formData,
+                    { headers: { "Content-Type": "multipart/form-data" } }
+                );
+
                 setProperties((prev) => [...prev, res.data.property]);
             }
+
             setEditData(null);
+            setSelectedFiles([]);
         } catch (err) {
-            console.error("Save error", err);
-            alert("Failed to save property details.");
+            console.error(err);
+            alert("Save failed");
         }
     };
+
 
     const filteredAndSearchedProperties = properties.filter((p) => {
         const typeMatch = filterType === "all" || p.propertyType === filterType;
@@ -153,7 +181,8 @@ const PropertyManage = () => {
                         </h2>
                         <button
                             className="bg-teal-600 hover:bg-teal-700 text-white font-medium px-5 py-2.5 rounded-lg shadow-md transition duration-200 transform hover:scale-[1.02]"
-                            onClick={() =>
+                            onClick={() => {
+                                setSelectedFiles([]);
                                 setEditData({
                                     title: "",
                                     propertyType: "house",
@@ -166,8 +195,8 @@ const PropertyManage = () => {
                                     amenities: [],
                                     images: [],
                                     isAvailable: true,
-                                })
-                            }
+                                });
+                            }}
                         >
                             + New Property
                         </button>
@@ -236,11 +265,11 @@ const PropertyManage = () => {
                                         <td className="px-6 py-4 text-sm text-gray-600">
                                             <div className="font-semibold text-gray-800">₹{p.rent}</div>
                                             <div className="text-xs text-gray-400">Dep: ₹{p.deposit}</div>
-                                            
+
                                         </td>
 
-                                                <td className="px-6 py-4 text-sm text-gray-600">{p.floor}</td>
-                                                <td className="px-6 py-4 text-sm text-gray-600">{p.doorNumber}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-600">{p.floor}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-600">{p.doorNumber}</td>
                                         <td className="px-6 py-4 text-sm text-gray-600">{p.area}</td>
                                         {/* <td className="px-6 py-4 text-sm text-gray-600">{p.location}</td> */}
                                         <td className="px-6 py-4 text-sm">
@@ -355,24 +384,35 @@ const PropertyManage = () => {
                                     type="file"
                                     multiple
                                     accept="image/*"
-                                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 cursor-pointer"
+                                    className="block w-full text-sm text-gray-500
+                                    file:mr-4 file:py-2 file:px-4
+                                    file:rounded-full file:border-0
+                                    file:text-sm file:font-semibold
+                                    file:bg-teal-50 file:text-teal-700
+                                     hover:file:bg-teal-100 cursor-pointer"
                                     onChange={(e) => {
-                                        const files = Array.from(e.target.files);
-                                        Promise.all(files.map(file => new Promise((res, rej) => {
-                                            const reader = new FileReader();
-                                            reader.onload = () => res(reader.result);
-                                            reader.onerror = rej;
-                                            reader.readAsDataURL(file);
-                                        }))).then(imgs => setEditData({ ...editData, images: imgs }));
+                                        setSelectedFiles(Array.from(e.target.files));
                                     }}
                                 />
-                                <div className="flex flex-wrap mt-2 gap-3">
+                                <div className="flex flex-wrap gap-3 mt-3">
+                                    {selectedFiles.map((file, idx) => (
+                                        <img
+                                            key={idx}
+                                            src={URL.createObjectURL(file)}
+                                            className="w-20 h-20 rounded-lg object-cover border"
+                                        />
+                                    ))}
+
                                     {editData.images?.map((img, idx) => (
-                                        <div key={idx} className="relative group">
-                                            <img src={img} alt="preview" className="w-20 h-20 object-cover rounded-lg border border-gray-200 shadow-sm" />
-                                        </div>
+                                        <img
+                                            key={idx}
+                                            src={`${apiUrl}${img}`}
+                                            className="w-20 h-20 rounded-lg object-cover border"
+                                        />
                                     ))}
                                 </div>
+
+
                             </div>
                         </div>
                     </Modal>
