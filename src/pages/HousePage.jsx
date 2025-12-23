@@ -151,92 +151,133 @@ const PropertyModal = ({ house, onClose }) => {
 
     return (
         <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-md flex items-center justify-center p-4">
-            <div className="bg-white max-w-5xl w-full rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col lg:flex-row max-h-[90vh]">
-                
-                {/* Left Side: Full Image/Gallery */}
-                <div className="lg:w-1/2 bg-slate-100 relative overflow-y-auto custom-scrollbar">
-                    <div className="grid grid-cols-1 gap-2 p-2">
-                        {house.images?.length > 0 ? (
-                            house.images.map((img, idx) => (
-                                <img 
-                                    key={idx}
-                                    src={`${apiUrl}${img}`} 
-                                    className="w-full h-72 lg:h-96 object-cover rounded-xl" 
-                                    alt={`Property ${idx}`} 
-                                />
-                            ))
-                        ) : (
-                            <div className="h-96 flex items-center justify-center bg-slate-200">No Images</div>
-                        )}
-                    </div>
-                    <button onClick={onClose} className="absolute top-5 left-5 bg-white/80 p-2 rounded-full shadow-lg lg:hidden">
-                        <XMarkIcon className="w-6 h-6 text-slate-900" />
-                    </button>
+            <div className="bg-white max-w-6xl w-full rounded-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row max-h-[90vh]">
+
+                {/* LEFT: IMAGE GALLERY */}
+                <div className="lg:w-1/2 bg-slate-100 overflow-y-auto p-3">
+                    {house.images?.length ? (
+                        house.images.map((img, idx) => (
+                            <img
+                                key={idx}
+                                src={`${apiUrl}${img}`}
+                                className="w-full h-72 object-cover rounded-xl mb-3"
+                            />
+                        ))
+                    ) : (
+                        <div className="h-96 flex items-center justify-center text-slate-400">
+                            No Images Available
+                        </div>
+                    )}
                 </div>
 
-                {/* Right Side: All Data Fields */}
-                <div className="lg:w-1/2 p-8 overflow-y-auto bg-white flex flex-col">
-                    <div className="hidden lg:flex justify-between items-center mb-6">
-                        <span className="bg-indigo-50 text-indigo-600 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
+                {/* RIGHT: ALL DETAILS */}
+                <div className="lg:w-1/2 p-8 overflow-y-auto">
+
+                    {/* Header */}
+                    <div className="flex justify-between items-start mb-6">
+                        <span className="px-4 py-1 rounded-full text-xs font-bold uppercase bg-indigo-100 text-indigo-700">
                             {house.propertyType}
                         </span>
-                        <button onClick={onClose} className="text-slate-400 hover:text-red-500 transition-colors">
-                            <XMarkIcon className="w-8 h-8" />
+                        <button onClick={onClose}>
+                            <XMarkIcon className="w-7 h-7 text-slate-500 hover:text-red-500" />
                         </button>
                     </div>
 
-                    <h2 className="text-3xl font-black text-slate-900 leading-tight mb-2">{house.title}</h2>
-                    <p className="text-slate-500 flex items-center gap-1 mb-6 text-sm">
-                        <MapPinIcon className="w-5 h-5 text-indigo-500" /> {house.location}
+                    <h2 className="text-3xl font-black mb-1">{house.title}</h2>
+                    <p className="text-slate-500 flex items-center gap-1 mb-4">
+                        <MapPinIcon className="w-4 h-4" /> {house.location}
                     </p>
 
-                    {/* Data Grid Section */}
-                    <div className="grid grid-cols-2 gap-4 mb-8">
-                        <div className="border border-slate-100 p-4 rounded-2xl bg-slate-50/50">
-                            <p className="text-[10px] text-slate-400 font-bold uppercase">Rent</p>
-                            <p className="text-xl font-black text-indigo-600">₹{house.rent?.toLocaleString()}</p>
+                    {/* Availability */}
+                    <div className="mb-6">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                            house.isAvailable
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                        }`}>
+                            {house.isAvailable ? "Available" : "Occupied"}
+                        </span>
+                    </div>
+
+                    {/* Pricing */}
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div className="bg-slate-50 p-4 rounded-xl">
+                            <p className="text-xs uppercase text-slate-400 font-bold">Rent</p>
+                            <p className="text-xl font-black text-indigo-600">₹{house.rent}</p>
                         </div>
-                        <div className="border border-slate-100 p-4 rounded-2xl bg-slate-50/50">
-                            <p className="text-[10px] text-slate-400 font-bold uppercase">Deposit</p>
-                            <p className="text-xl font-black text-slate-900">₹{house.deposit?.toLocaleString()}</p>
+                        <div className="bg-slate-50 p-4 rounded-xl">
+                            <p className="text-xs uppercase text-slate-400 font-bold">Deposit</p>
+                            <p className="text-xl font-black">₹{house.deposit}</p>
                         </div>
-                        <div className="flex items-center gap-3 p-3 border-b border-slate-50">
-                            <FaLayerGroup className="text-indigo-400" />
+                    </div>
+
+                    {/* Property Info */}
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div className="flex items-center gap-3">
+                            <FaLayerGroup className="text-indigo-500" />
                             <div>
-                                <p className="text-[10px] text-slate-400 uppercase font-bold leading-none">Floor</p>
-                                <p className="text-sm font-bold">{house.floor || "N/A"}</p>
+                                <p className="text-xs text-slate-400 font-bold">Floor</p>
+                                <p className="font-semibold">{house.floor}</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3 p-3 border-b border-slate-50">
-                            <FaDoorOpen className="text-indigo-400" />
+
+                        <div className="flex items-center gap-3">
+                            <FaDoorOpen className="text-indigo-500" />
                             <div>
-                                <p className="text-[10px] text-slate-400 uppercase font-bold leading-none">Door No.</p>
-                                <p className="text-sm font-bold">{house.doorNumber || "N/A"}</p>
+                                <p className="text-xs text-slate-400 font-bold">Door No</p>
+                                <p className="font-semibold">{house.doorNumber}</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                            <FaRulerCombined className="text-indigo-500" />
+                            <div>
+                                <p className="text-xs text-slate-400 font-bold">Area</p>
+                                <p className="font-semibold">{house.area} sqft</p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Amenities Tag Cloud */}
+                    {/* Description */}
+                    {house.description && (
+                        <div className="mb-6">
+                            <h4 className="text-xs font-bold text-slate-400 uppercase mb-2">
+                                Description
+                            </h4>
+                            <p className="text-slate-600 leading-relaxed">
+                                {house.description}
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Amenities */}
                     <div className="mb-8">
-                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Included Amenities</h4>
+                        <h4 className="text-xs font-bold text-slate-400 uppercase mb-3">
+                            Amenities
+                        </h4>
                         <div className="flex flex-wrap gap-2">
-                            {house.amenities?.map((item, i) => (
-                                <span key={i} className="px-4 py-2 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-xl border border-indigo-100">
-                                    {item}
-                                </span>
-                            ))}
+                            {house.amenities?.length ? (
+                                house.amenities.map((a, i) => (
+                                    <span
+                                        key={i}
+                                        className="px-4 py-2 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-xl"
+                                    >
+                                        {a}
+                                    </span>
+                                ))
+                            ) : (
+                                <p className="text-slate-400 text-sm">No amenities listed</p>
+                            )}
                         </div>
                     </div>
 
-                    {/* Footer Action */}
-                    <div className="mt-auto pt-6">
-                        <button 
-                            onClick={() => { alert("Booking Confirmed!"); onClose(); }}
-                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-xl shadow-indigo-100 transition-all flex items-center justify-center gap-3"
-                        >
-                            Confirm Booking Request <FaArrowRight />
-                        </button>
-                    </div>
+                    {/* Footer Button */}
+                    <button
+                        onClick={onClose}
+                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg"
+                    >
+                        Close Property Details
+                    </button>
                 </div>
             </div>
         </div>
@@ -329,10 +370,7 @@ const HousePage = () => {
                                             <FaRulerCombined className="text-indigo-500 mx-auto mb-1" />
                                             <p className="text-[10px] font-bold text-slate-800">{house.area} <span className="text-slate-400">Sqft</span></p>
                                         </div>
-                                        <div className="text-center">
-                                            <FaBed className="text-indigo-500 mx-auto mb-1" />
-                                            <p className="text-[10px] font-bold text-slate-800">2 <span className="text-slate-400">BHK</span></p>
-                                        </div>
+                                
                                     </div>
 
                                     <button
