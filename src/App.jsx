@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage";
 import OverLayout from "./layouts/OverLayout";
 import HousePage from "./pages/HousePage";
 import ShopPage from "./pages/ShopPage";
+import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
@@ -25,6 +26,7 @@ function App() {
                     <Route path="homepage" element={<HomePage />} />
                     <Route path="houses" element={<HousePage />} />
                     <Route path="shops" element={<ShopPage />} />
+                    <Route path="about" element={<AboutPage />} />
                     <Route path="contact" element={<ContactPage />} />
                     <Route path="login" element={<LoginPage />} />
 
