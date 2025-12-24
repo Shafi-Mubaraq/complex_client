@@ -3,6 +3,7 @@ import { Users, ClipboardList, MessageCircle, Building, Store, Home } from "luci
 
 import UserManage from "../pages/UserManage";
 import PropertyManage from "./PropertyManage"
+import BookingRequest from "./BookingRequest";
 
 const fullName = sessionStorage.getItem("fullName");
 const mobile = sessionStorage.getItem("mobile");
@@ -94,6 +95,17 @@ const DashboardPage = () => {
                         <Home />
                         Property Management
                     </button>
+                    
+                    <button
+                        onClick={() => setDashboardTab("bookingRequest")}
+                        className={`w-full p-3 rounded-lg text-left flex gap-3 ${dashboardTab === "bookingRequest"
+                            ? "bg-indigo-100 text-indigo-700"
+                            : "hover:bg-gray-100"
+                            }`}
+                    >
+                        <MessageCircle />
+                        Booking Request
+                    </button>
 
                 </nav>
             </div>
@@ -103,6 +115,7 @@ const DashboardPage = () => {
                 {dashboardTab === "request" && <h2 className="text-xl font-bold">Raise Request</h2>}
                 {dashboardTab === "houses" && <h2 className="text-xl font-bold">Houses</h2>}
                 {dashboardTab === "shops" && <h2 className="text-xl font-bold">Shops</h2>}
+                {dashboardTab === "bookingRequest" && <BookingRequest />}
                 {dashboardTab === "property" && <PropertyManage />}
             </div>
         </div>

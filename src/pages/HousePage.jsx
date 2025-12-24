@@ -147,7 +147,71 @@ import { FaBed, FaBath, FaRulerCombined, FaCheckCircle, FaTimesCircle, FaArrowRi
 /* ================= 1. PURE WHITE POPUP MODAL ================= */
 const PropertyModal = ({ house, onClose }) => {
     if (!house) return null;
-    const apiUrl = import.meta.env.VITE_API_URL?.trim() || 'http://localhost:5000';
+
+    const apiUrl = import.meta.env.VITE_API_URL?.trim() || "http://localhost:5000";
+
+    const [form, setForm] = useState({
+        fullName: "",
+        familyType: "",
+        numberOfMembers: "",
+        phoneNumber: "",
+        address: "",
+        aadharNumber: "",
+        message: "",
+    });
+
+    const [status, setStatus] = useState("");
+    const [loading, setLoading] = useState(false);
+
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    };
+
+    const submitRequest = async () => {
+        try {
+            setLoading(true);
+            setStatus("");
+
+            /* ================= FRONTEND VALIDATION ================= */
+            if (
+                !form.fullName ||
+                !form.familyType ||
+                !form.numberOfMembers ||
+                !form.phoneNumber ||
+                !form.address ||
+                !form.aadharNumber
+            ) {
+                setStatus("error");
+                setLoading(false);
+                return; // ⛔ STOP API CALL
+            }
+            /* ======================================================= */
+
+            await axios.post(`${apiUrl}/api/propertyRequest/create`, {
+                property: house.title,
+                propertyType: "house",
+
+                applicantDetails: {
+                    fullName: form.fullName,
+                    familyType: form.familyType,
+                    numberOfMembers: form.numberOfMembers,
+                    phoneNumber: form.phoneNumber,
+                    address: form.address,
+                    aadharNumber: form.aadharNumber,
+                },
+
+                message: form.message,
+            });
+
+            setStatus("success");
+        } catch (err) {
+            console.error(err);
+            setStatus("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     return (
         <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-md flex items-center justify-center p-4">
@@ -190,11 +254,10 @@ const PropertyModal = ({ house, onClose }) => {
 
                     {/* Availability */}
                     <div className="mb-6">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                            house.isAvailable
-                                ? "bg-green-100 text-green-700"
-                                : "bg-red-100 text-red-700"
-                        }`}>
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${house.isAvailable
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                            }`}>
                             {house.isAvailable ? "Available" : "Occupied"}
                         </span>
                     </div>
@@ -272,12 +335,47 @@ const PropertyModal = ({ house, onClose }) => {
                     </div>
 
                     {/* Footer Button */}
-                    <button
-                        onClick={onClose}
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg"
-                    >
-                        Close Property Details
-                    </button>
+                    {house.isAvailable && (
+                        <div className="border-t pt-8">
+                            <h3 className="text-xl font-black mb-6">Request This Property</h3>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <input className="input" name="fullName" placeholder="Full Name" onChange={handleChange} />
+                                <select className="input" name="familyType" onChange={handleChange}>
+                                    <option value="">Family Type</option>
+                                    <option value="nuclear">Nuclear</option>
+                                    <option value="joint">Joint</option>
+                                    <option value="bachelor">Bachelor</option>
+                                </select>
+                                <input className="input" name="numberOfMembers" placeholder="Members" onChange={handleChange} />
+                                <input className="input" name="phoneNumber" placeholder="Phone Number" onChange={handleChange} />
+                            </div>
+
+                            <input className="input mt-4" name="address" placeholder="Address" onChange={handleChange} />
+                            <input className="input mt-4" name="aadharNumber" placeholder="Aadhar Number" onChange={handleChange} />
+                            <textarea className="input mt-4" name="message" placeholder="Message (optional)" onChange={handleChange} />
+
+                            {status === "success" && (
+                                <p className="mt-4 text-green-700 font-bold flex gap-2">
+                                    <FaCheckCircle /> Request Sent Successfully
+                                </p>
+                            )}
+                            {status === "error" && (
+                                <p className="mt-4 text-red-700 font-bold flex gap-2">
+                                    <FaTimesCircle /> Request Failed
+                                </p>
+                            )}
+
+                            <button
+                                onClick={submitRequest}
+                                disabled={loading}
+                                className="mt-6 w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl flex justify-center gap-2"
+                            >
+                                {loading ? "Submitting..." : "Send Request"} <FaArrowRight />
+                            </button>
+                        </div>
+                    )}
+
                 </div>
             </div>
         </div>
@@ -296,7 +394,7 @@ const HousePage = () => {
             try {
                 const res = await axios.get(`${apiUrl}/api/house/fetchData`);
                 setHouses(res.data);
-            } catch (err) { console.error(err); } 
+            } catch (err) { console.error(err); }
             finally { setLoading(false); }
         };
         fetchHouses();
@@ -324,7 +422,7 @@ const HousePage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
                     {houses.map((house) => (
                         <div key={house._id} className="group bg-white rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden flex flex-col">
-                            
+
                             {/* Card Image */}
                             <div className="relative h-72 overflow-hidden">
                                 <img
@@ -333,9 +431,8 @@ const HousePage = () => {
                                     alt={house.title}
                                 />
                                 <div className="absolute top-6 left-6">
-                                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                                        house.isAvailable ? "bg-white/90 text-indigo-600 shadow-xl" : "bg-red-500 text-white"
-                                    }`}>
+                                    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${house.isAvailable ? "bg-white/90 text-indigo-600 shadow-xl" : "bg-red-500 text-white"
+                                        }`}>
                                         {house.isAvailable ? "Available" : "Occupied"}
                                     </span>
                                 </div>
@@ -370,17 +467,16 @@ const HousePage = () => {
                                             <FaRulerCombined className="text-indigo-500 mx-auto mb-1" />
                                             <p className="text-[10px] font-bold text-slate-800">{house.area} <span className="text-slate-400">Sqft</span></p>
                                         </div>
-                                
+
                                     </div>
 
                                     <button
                                         disabled={!house.isAvailable}
                                         onClick={() => setSelectedHouse(house)}
-                                        className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${
-                                            house.isAvailable 
-                                            ? "bg-slate-900 text-white hover:bg-indigo-600 shadow-lg shadow-indigo-100" 
+                                        className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${house.isAvailable
+                                            ? "bg-slate-900 text-white hover:bg-indigo-600 shadow-lg shadow-indigo-100"
                                             : "bg-slate-100 text-slate-300 cursor-not-allowed"
-                                        }`}
+                                            }`}
                                     >
                                         View House
                                     </button>

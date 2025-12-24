@@ -17,6 +17,53 @@ const PropertyModal = ({ property, onClose }) => {
   if (!property) return null;
   const apiUrl = import.meta.env.VITE_API_URL?.trim() || "http://localhost:5000";
 
+  const [formData, setFormData] = useState({
+    fullName: "",
+    familyType: "",
+    numberOfMembers: "",
+    phoneNumber: "",
+    address: "",
+    aadharNumber: "",
+    message: "",
+  });
+
+  const [submitting, setSubmitting] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmitRequest = async () => {
+    try {
+      setSubmitting(true);
+
+      await axios.post(`${apiUrl}/api/propertyRequest/create`, {
+        property: property.title,
+        propertyType: "shop", // or "house"
+
+        applicantDetails: {
+          fullName: formData.fullName,
+          familyType: formData.familyType,
+          numberOfMembers: formData.numberOfMembers,
+          phoneNumber: formData.phoneNumber,
+          address: formData.address,
+          aadharNumber: formData.aadharNumber,
+        },
+
+        message: formData.message,
+      });
+
+
+      setSuccessMsg("Request submitted successfully!");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-md flex items-center justify-center p-4">
       <div className="bg-white max-w-6xl w-full rounded-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row max-h-[90vh]">
@@ -56,11 +103,10 @@ const PropertyModal = ({ property, onClose }) => {
 
           <div className="mb-6">
             <span
-              className={`px-3 py-1 rounded-full text-xs font-bold ${
-                property.isAvailable
+              className={`px-3 py-1 rounded-full text-xs font-bold ${property.isAvailable
                   ? "bg-green-100 text-green-700"
                   : "bg-red-100 text-red-700"
-              }`}
+                }`}
             >
               {property.isAvailable ? "Available" : "Occupied"}
             </span>
@@ -132,12 +178,81 @@ const PropertyModal = ({ property, onClose }) => {
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg"
-          >
-            Close Shop Details
-          </button>
+          {/* ================= PROPERTY REQUEST FORM ================= */}
+          <div className="mt-10 border-t pt-8">
+            <h3 className="text-lg font-black mb-4 text-slate-800">
+              Request This Shop
+            </h3>
+
+            {successMsg && (
+              <p className="mb-4 text-green-600 font-bold">{successMsg}</p>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <input
+                name="fullName"
+                placeholder="Full Name"
+                className="border p-3 rounded-xl"
+                onChange={handleChange}
+              />
+
+              <select
+                name="familyType"
+                className="border p-3 rounded-xl"
+                onChange={handleChange}
+              >
+                <option value="">Family Type</option>
+                <option value="nuclear">Nuclear</option>
+                <option value="joint">Joint</option>
+                <option value="bachelor">Bachelor</option>
+              </select>
+
+              <input
+                name="numberOfMembers"
+                type="number"
+                placeholder="Number of Members"
+                className="border p-3 rounded-xl"
+                onChange={handleChange}
+              />
+
+              <input
+                name="phoneNumber"
+                placeholder="Phone Number"
+                className="border p-3 rounded-xl"
+                onChange={handleChange}
+              />
+
+              <input
+                name="aadharNumber"
+                placeholder="Aadhar Number"
+                className="border p-3 rounded-xl"
+                onChange={handleChange}
+              />
+
+              <input
+                name="address"
+                placeholder="Address"
+                className="border p-3 rounded-xl md:col-span-2"
+                onChange={handleChange}
+              />
+
+              <textarea
+                name="message"
+                placeholder="Message (optional)"
+                className="border p-3 rounded-xl md:col-span-2"
+                onChange={handleChange}
+              />
+            </div>
+
+            <button
+              disabled={submitting}
+              onClick={handleSubmitRequest}
+              className="mt-6 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl"
+            >
+              {submitting ? "Submitting..." : "Submit Request"}
+            </button>
+          </div>
+
         </div>
       </div>
     </div>
@@ -206,11 +321,10 @@ const ShopsPage = () => {
                 />
                 <div className="absolute top-6 left-6">
                   <span
-                    className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                      shop.isAvailable
+                    className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${shop.isAvailable
                         ? "bg-white/90 text-indigo-600"
                         : "bg-red-500 text-white"
-                    }`}
+                      }`}
                   >
                     {shop.isAvailable ? "Available" : "Occupied"}
                   </span>
@@ -259,11 +373,10 @@ const ShopsPage = () => {
                   <button
                     disabled={!shop.isAvailable}
                     onClick={() => setSelectedShop(shop)}
-                    className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${
-                      shop.isAvailable
+                    className={`px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${shop.isAvailable
                         ? "bg-slate-900 text-white hover:bg-indigo-600"
                         : "bg-slate-100 text-slate-300 cursor-not-allowed"
-                    }`}
+                      }`}
                   >
                     View Shop
                   </button>
