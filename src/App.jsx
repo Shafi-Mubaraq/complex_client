@@ -15,34 +15,29 @@ const PrivateRoute = ({ children }) => {
 };
 
 function App() {
+
     return (
         <Router>
             <Routes>
                 <Route path="/*" element={<OverLayout />}>
-
                     {/* Default Route */}
                     <Route index element={<Navigate to="homepage" replace />} />
-
                     <Route path="homepage" element={<HomePage />} />
                     <Route path="houses" element={<HousePage />} />
                     <Route path="shops" element={<ShopPage />} />
                     <Route path="about" element={<AboutPage />} />
                     <Route path="contact" element={<ContactPage />} />
                     <Route path="login" element={<LoginPage />} />
-
                     {/* 🔐 Protected Dashboard */}
-                    <Route
-                        path="dashboard"
-                        element={
-                            <PrivateRoute>
-                                <Dashboard />
-                            </PrivateRoute>
-                        }
-                    />
+                    <Route path="dashboard" element={
+                        <PrivateRoute>
+                            <Dashboard />
+                        </PrivateRoute>
+                    } />
                 </Route>
             </Routes>
         </Router>
-    );
+    )
 }
 
 export default App;
