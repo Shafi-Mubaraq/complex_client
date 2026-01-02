@@ -40,15 +40,15 @@ function OverLayout() {
 
                 <ul className="hidden md:flex gap-2 items-center">
                     <NavLink to="/homepage" className={linkClass}>Home</NavLink>
-                    <NavLink to="/houses" className={linkClass}>Houses</NavLink>
-                    <NavLink to="/shops" className={linkClass}>Shops</NavLink>
-                    <NavLink to="/about" className={linkClass}>About</NavLink>
-                    <NavLink to="/contact" className={linkClass}>Contact</NavLink>
                     {role && (
                         <NavLink to="/dashboard" className={linkClass}>
                             Dashboard
                         </NavLink>
                     )}
+                    <NavLink to="/houses" className={linkClass}>Houses</NavLink>
+                    <NavLink to="/shops" className={linkClass}>Shops</NavLink>
+                    <NavLink to="/about" className={linkClass}>About</NavLink>
+                    <NavLink to="/contact" className={linkClass}>Contact</NavLink>
                 </ul>
 
                 {!role ? (

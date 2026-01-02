@@ -38,7 +38,7 @@ const DashboardPage = () => {
                             }`}
                     >
                         <ClipboardList />
-                        My Bookings
+                        My Portal
                     </button>
 
                     <button
@@ -95,7 +95,7 @@ const DashboardPage = () => {
                         <Home />
                         Property Management
                     </button>
-                    
+
                     <button
                         onClick={() => setDashboardTab("bookingRequest")}
                         className={`w-full p-3 rounded-lg text-left flex gap-3 ${dashboardTab === "bookingRequest"
