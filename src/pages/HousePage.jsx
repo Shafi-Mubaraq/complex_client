@@ -1,151 +1,15 @@
-// import React, { useState, useEffect } from 'react';
-// import PropertyCard from "../components/Common/PropertyCard";
-// // import BookingModal from "../components/Common/BookingModal";
-// import PropertyModal from '../components/Common/PropertyModal';
-// import axios from 'axios';
-
-// import { XCircleIcon, SparklesIcon, HomeModernIcon, MapPinIcon } from '@heroicons/react/24/outline';
-
-
-// const SkeletonCard = () => (
-//     <div className="animate-pulse bg-white p-4 rounded-xl shadow-lg border border-gray-200">
-//         <div className="w-full h-56 bg-gray-200 rounded-lg mb-4"></div>
-//         <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
-//         <div className="h-4 bg-gray-200 rounded mb-4"></div>
-//         <div className="flex justify-between mt-4">
-//             <div className="h-4 w-1/4 bg-gray-200 rounded"></div>
-//             <div className="h-4 w-1/6 bg-gray-200 rounded"></div>
-//         </div>
-//     </div>
-// );
-
-// const HousePage = () => {
-
-//     const [properties, setProperties] = useState([]);
-//     const [loading, setLoading] = useState(false);
-//     const [error, setError] = useState(null);
-//     const [modalOpen, setModalOpen] = useState(false);
-//     const [modalProperty, setModalProperty] = useState(null);
-//     const [modalType, setModalType] = useState("view");
-
-//     const openModal = ({ type, data }) => {
-//         setModalType(type);
-//         setModalProperty(data);
-//         setModalOpen(true);
-//     };
-
-
-//     /* 🔹 NEW: booking modal state */
-//     const [selectedProperty, setSelectedProperty] = useState(null);
-
-//     const apiUrl = import.meta.env.VITE_API_URL?.trim() || 'http://localhost:5000';
-
-//     useEffect(() => {
-//         const fetchData = async () => {
-//             setLoading(true);
-//             setError(null);
-//             try {
-//                 const response = await axios.get(`${apiUrl}/api/house/fetchData`);
-//                 if (Array.isArray(response.data) && response.data.length > 0) {
-//                     setProperties(response.data);
-//                 }
-//             } catch (err) {
-//                 setError("⚠️ We couldn't load live listings. Displaying a curated sample.");
-//             } finally {
-//                 setTimeout(() => setLoading(false), 500);
-//             }
-//         };
-//         fetchData();
-//     }, [apiUrl]);
-
-//     const confirmBooking = () => {
-//         alert(`🏡 Booking confirmed for ${selectedProperty.title}`);
-//         setSelectedProperty(null);
-//     };
-
-//     if (loading) {
-//         return (
-//             <section className="py-20 px-4 min-h-[90vh] bg-white">
-//                 <div className="max-w-7xl mx-auto">
-//                     <div className="text-center mb-16">
-//                         <HomeModernIcon className="w-12 h-12 mx-auto text-indigo-500 mb-4 animate-bounce" />
-//                         <h2 className="text-3xl font-bold text-gray-900">
-//                             Preparing Residential Listings...
-//                         </h2>
-//                     </div>
-
-//                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-//                         <SkeletonCard />
-//                         <SkeletonCard />
-//                         <SkeletonCard />
-//                     </div>
-//                 </div>
-//             </section>
-//         );
-//     }
-
-//     return (
-//         <section className="py-20 px-4 min-h-[90vh] bg-white">
-//             <div className="max-w-7xl mx-auto">
-
-//                 {error && (
-//                     <div className="flex bg-red-50 p-6 rounded-2xl mb-12 border border-red-200">
-//                         <XCircleIcon className="w-6 h-6 text-red-500 mr-3" />
-//                         <p className="text-red-700">{error}</p>
-//                     </div>
-//                 )}
-
-//                 <div className="text-center mb-4">
-//                     <SparklesIcon className="w-10 h-10 mx-auto text-indigo-500 mb-2" />
-//                 </div>
-
-//                 <h1 className="text-5xl font-extrabold text-gray-900 text-center mb-6">
-//                     Luxury Residential <span className="text-indigo-600">Homes</span>
-//                 </h1>
-
-//                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
-//                     {properties.map((property, index) => (
-//                         <PropertyCard
-//                             key={property.id || index}
-//                             {...property}
-//                             src={property.src}
-//                             onActionClick={openModal}
-//                         />
-//                     ))}
-
-//                 </div>
-//             </div>
-
-//             {/* 🔹 Booking Modal */}
-//             {/* <BookingModal
-//                 open={!!selectedProperty}
-//                 property={selectedProperty}
-//                 onClose={() => setSelectedProperty(null)}
-//                 onConfirm={confirmBooking}
-//             /> */}
-
-//             <PropertyModal
-//                 open={modalOpen}
-//                 onClose={() => setModalOpen(false)}
-//                 property={modalProperty}
-//                 type={modalType}
-//             />
-
-//         </section>
-//     );
-// };
-
-// export default HousePage;
-
-
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { XMarkIcon, SparklesIcon, HomeModernIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import { FaBed, FaBath, FaRulerCombined, FaCheckCircle, FaTimesCircle, FaArrowRight, FaDoorOpen, FaLayerGroup } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 /* ================= 1. PURE WHITE POPUP MODAL ================= */
+
+
+
 const PropertyModal = ({ house, onClose }) => {
+    const navigate = useNavigate();
     if (!house) return null;
 
     const apiUrl = import.meta.env.VITE_API_URL?.trim() || "http://localhost:5000";
@@ -163,224 +27,201 @@ const PropertyModal = ({ house, onClose }) => {
     const [status, setStatus] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const handleChange = (e) => {
+    const handleChange = (e) =>
         setForm({ ...form, [e.target.name]: e.target.value });
-    };
 
     const submitRequest = async () => {
+        setStatus("");
+
+        if (
+            !form.fullName ||
+            !form.familyType ||
+            !form.numberOfMembers ||
+            !form.phoneNumber ||
+            !form.address ||
+            !form.aadharNumber
+        ) {
+            setStatus("error");
+            return;
+        }
+
         try {
             setLoading(true);
-            setStatus("");
-
-            /* ================= FRONTEND VALIDATION ================= */
-            if (
-                !form.fullName ||
-                !form.familyType ||
-                !form.numberOfMembers ||
-                !form.phoneNumber ||
-                !form.address ||
-                !form.aadharNumber
-            ) {
-                setStatus("error");
-                setLoading(false);
-                return; // ⛔ STOP API CALL
-            }
-            /* ======================================================= */
-
             await axios.post(`${apiUrl}/api/propertyRequest/create`, {
                 property: house.title,
                 propertyType: "house",
-
-                applicantDetails: {
-                    fullName: form.fullName,
-                    familyType: form.familyType,
-                    numberOfMembers: form.numberOfMembers,
-                    phoneNumber: form.phoneNumber,
-                    address: form.address,
-                    aadharNumber: form.aadharNumber,
-                },
-
+                applicantDetails: form,
                 message: form.message,
             });
 
             setStatus("success");
+            setForm({
+                fullName: "",
+                familyType: "",
+                numberOfMembers: "",
+                phoneNumber: "",
+                address: "",
+                aadharNumber: "",
+                message: "",
+            });
+
+            setTimeout(() => navigate("/Dashboard"), 1200);
         } catch (err) {
-            console.error(err);
             setStatus("error");
         } finally {
             setLoading(false);
         }
     };
 
-
     return (
-        <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-md flex items-center justify-center p-4">
-            <div className="bg-white max-w-6xl w-full rounded-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row max-h-[90vh]">
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+            <div className="bg-white w-full max-w-6xl rounded-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row max-h-[92vh]">
 
-                {/* LEFT: IMAGE GALLERY */}
-                <div className="lg:w-1/2 bg-slate-100 overflow-y-auto p-3">
+                {/* LEFT – IMAGE PREVIEW */}
+                <div className="lg:w-1/2 bg-slate-100 overflow-y-auto p-4">
                     {house.images?.length ? (
-                        house.images.map((img, idx) => (
+                        house.images.map((img, i) => (
                             <img
-                                key={idx}
+                                key={i}
                                 src={`${apiUrl}${img}`}
-                                className="w-full h-72 object-cover rounded-xl mb-3"
+                                className="w-full h-72 object-cover rounded-2xl mb-4"
                             />
                         ))
                     ) : (
-                        <div className="h-96 flex items-center justify-center text-slate-400">
+                        <div className="h-full flex items-center justify-center text-slate-400">
                             No Images Available
                         </div>
                     )}
                 </div>
 
-                {/* RIGHT: ALL DETAILS */}
-                <div className="lg:w-1/2 p-8 overflow-y-auto">
+                {/* RIGHT – DETAILS */}
+                <div className="lg:w-1/2 flex flex-col overflow-y-auto">
 
-                    {/* Header */}
-                    <div className="flex justify-between items-start mb-6">
-                        <span className="px-4 py-1 rounded-full text-xs font-bold uppercase bg-indigo-100 text-indigo-700">
-                            {house.propertyType}
-                        </span>
+                    {/* HEADER */}
+                    <div className="sticky top-0 z-10 bg-white border-b p-6 flex justify-between items-center">
+                        <div>
+                            <h2 className="text-2xl font-black">{house.title}</h2>
+                            <p className="text-slate-500 flex items-center gap-1 text-sm">
+                                <MapPinIcon className="w-4 h-4" /> {house.location}
+                            </p>
+                        </div>
                         <button onClick={onClose}>
                             <XMarkIcon className="w-7 h-7 text-slate-500 hover:text-red-500" />
                         </button>
                     </div>
 
-                    <h2 className="text-3xl font-black mb-1">{house.title}</h2>
-                    <p className="text-slate-500 flex items-center gap-1 mb-4">
-                        <MapPinIcon className="w-4 h-4" /> {house.location}
-                    </p>
+                    {/* CONTENT */}
+                    <div className="p-8">
 
-                    {/* Availability */}
-                    <div className="mb-6">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${house.isAvailable
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                            }`}>
-                            {house.isAvailable ? "Available" : "Occupied"}
-                        </span>
-                    </div>
-
-                    {/* Pricing */}
-                    <div className="grid grid-cols-2 gap-4 mb-6">
-                        <div className="bg-slate-50 p-4 rounded-xl">
-                            <p className="text-xs uppercase text-slate-400 font-bold">Rent</p>
-                            <p className="text-xl font-black text-indigo-600">₹{house.rent}</p>
-                        </div>
-                        <div className="bg-slate-50 p-4 rounded-xl">
-                            <p className="text-xs uppercase text-slate-400 font-bold">Deposit</p>
-                            <p className="text-xl font-black">₹{house.deposit}</p>
-                        </div>
-                    </div>
-
-                    {/* Property Info */}
-                    <div className="grid grid-cols-2 gap-4 mb-6">
-                        <div className="flex items-center gap-3">
-                            <FaLayerGroup className="text-indigo-500" />
-                            <div>
-                                <p className="text-xs text-slate-400 font-bold">Floor</p>
-                                <p className="font-semibold">{house.floor}</p>
-                            </div>
+                        {/* TOP 10 FIELDS – UNCHANGED */}
+                        <div className="grid grid-cols-2 gap-6 mb-8">
+                            <Info label="Status" value={house.isAvailable ? "Available" : "Occupied"} />
+                            <Info label="Property Type" value={house.propertyType} />
+                            <Info label="Rent" value={`₹${house.rent}`} highlight />
+                            <Info label="Deposit" value={`₹${house.deposit}`} />
+                            <Info label="Floor" value={house.floor} />
+                            <Info label="Door No" value={house.doorNumber} />
+                            <Info label="Area" value={`${house.area} sqft`} />
+                            <Info label="Location" value={house.location} />
+                            <Info label="Amenities" value={house.amenities?.length || 0} />
+                            <Info label="Availability" value={house.isAvailable ? "Yes" : "No"} />
                         </div>
 
-                        <div className="flex items-center gap-3">
-                            <FaDoorOpen className="text-indigo-500" />
-                            <div>
-                                <p className="text-xs text-slate-400 font-bold">Door No</p>
-                                <p className="font-semibold">{house.doorNumber}</p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                            <FaRulerCombined className="text-indigo-500" />
-                            <div>
-                                <p className="text-xs text-slate-400 font-bold">Area</p>
-                                <p className="font-semibold">{house.area} sqft</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Description */}
-                    {house.description && (
-                        <div className="mb-6">
-                            <h4 className="text-xs font-bold text-slate-400 uppercase mb-2">
-                                Description
-                            </h4>
-                            <p className="text-slate-600 leading-relaxed">
-                                {house.description}
-                            </p>
-                        </div>
-                    )}
-
-                    {/* Amenities */}
-                    <div className="mb-8">
-                        <h4 className="text-xs font-bold text-slate-400 uppercase mb-3">
-                            Amenities
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                            {house.amenities?.length ? (
-                                house.amenities.map((a, i) => (
-                                    <span
-                                        key={i}
-                                        className="px-4 py-2 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-xl"
-                                    >
-                                        {a}
-                                    </span>
-                                ))
-                            ) : (
-                                <p className="text-slate-400 text-sm">No amenities listed</p>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Footer Button */}
-                    {house.isAvailable && (
-                        <div className="border-t pt-8">
-                            <h3 className="text-xl font-black mb-6">Request This Property</h3>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <input className="input" name="fullName" placeholder="Full Name" onChange={handleChange} />
-                                <select className="input" name="familyType" onChange={handleChange}>
-                                    <option value="">Family Type</option>
-                                    <option value="nuclear">Nuclear</option>
-                                    <option value="joint">Joint</option>
-                                    <option value="bachelor">Bachelor</option>
-                                </select>
-                                <input className="input" name="numberOfMembers" placeholder="Members" onChange={handleChange} />
-                                <input className="input" name="phoneNumber" placeholder="Phone Number" onChange={handleChange} />
-                            </div>
-
-                            <input className="input mt-4" name="address" placeholder="Address" onChange={handleChange} />
-                            <input className="input mt-4" name="aadharNumber" placeholder="Aadhar Number" onChange={handleChange} />
-                            <textarea className="input mt-4" name="message" placeholder="Message (optional)" onChange={handleChange} />
-
-                            {status === "success" && (
-                                <p className="mt-4 text-green-700 font-bold flex gap-2">
-                                    <FaCheckCircle /> Request Sent Successfully
+                        {/* DESCRIPTION */}
+                        {house.description && (
+                            <div className="mb-10">
+                                <h4 className="text-xs font-bold uppercase text-slate-400 mb-2">
+                                    Description
+                                </h4>
+                                <p className="text-slate-600 leading-relaxed">
+                                    {house.description}
                                 </p>
-                            )}
-                            {status === "error" && (
-                                <p className="mt-4 text-red-700 font-bold flex gap-2">
-                                    <FaTimesCircle /> Request Failed
-                                </p>
-                            )}
+                            </div>
+                        )}
 
-                            <button
-                                onClick={submitRequest}
-                                disabled={loading}
-                                className="mt-6 w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl flex justify-center gap-2"
-                            >
-                                {loading ? "Submitting..." : "Send Request"} <FaArrowRight />
-                            </button>
-                        </div>
-                    )}
+                        {/* REQUEST FORM */}
+                        {house.isAvailable && (
+                            <div className="border-t pt-8">
+                                <h3 className="text-xl font-black mb-6">
+                                    Property Request Form
+                                </h3>
 
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Input name="fullName" placeholder="Full Name *" value={form.fullName} onChange={handleChange} />
+                                    <select className="input" name="familyType" value={form.familyType} onChange={handleChange}>
+                                        <option value="">Family Type *</option>
+                                        <option value="nuclear">Nuclear</option>
+                                        <option value="joint">Joint</option>
+                                        <option value="bachelor">Bachelor</option>
+                                    </select>
+                                    <Input name="numberOfMembers" placeholder="Members *" value={form.numberOfMembers} onChange={handleChange} />
+                                    <Input name="phoneNumber" placeholder="Phone *" value={form.phoneNumber} onChange={handleChange} />
+                                </div>
+
+                                <Input className="mt-4" name="address" placeholder="Address *" value={form.address} onChange={handleChange} />
+                                <Input className="mt-4" name="aadharNumber" placeholder="Aadhar *" value={form.aadharNumber} onChange={handleChange} />
+
+                                <textarea
+                                    className="input mt-4"
+                                    name="message"
+                                    placeholder="Message (Optional)"
+                                    value={form.message}
+                                    onChange={handleChange}
+                                />
+
+                                {/* RESPONSE VIEW */}
+                                {status && (
+                                    <div className={`mt-5 p-4 rounded-xl font-semibold flex gap-2 ${
+                                        status === "success"
+                                            ? "bg-green-50 text-green-700"
+                                            : "bg-red-50 text-red-700"
+                                    }`}>
+                                        {status === "success" ? <FaCheckCircle /> : <FaTimesCircle />}
+                                        {status === "success"
+                                            ? "Request submitted successfully!"
+                                            : "Please fill all required fields."}
+                                    </div>
+                                )}
+
+                                <button
+                                    onClick={submitRequest}
+                                    disabled={loading}
+                                    className={`mt-6 w-full py-4 rounded-2xl font-black flex justify-center items-center gap-2 ${
+                                        loading
+                                            ? "bg-gray-300"
+                                            : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                                    }`}
+                                >
+                                    {loading ? "Submitting..." : "Send Request"}
+                                    {!loading && <FaArrowRight />}
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
+
+/* SMALL REUSABLE COMPONENTS */
+const Info = ({ label, value, highlight }) => (
+    <div className="bg-slate-50 p-4 rounded-xl">
+        <p className="text-xs uppercase text-slate-400 font-bold">{label}</p>
+        <p className={`font-black ${highlight ? "text-indigo-600 text-lg" : ""}`}>
+            {value}
+        </p>
+    </div>
+);
+
+const Input = (props) => (
+    <input {...props} className={`input ${props.className || ""}`} />
+);
+
+
+
+
+
 
 /* ================= 2. HOUSE PAGE (PURE WHITE BACKGROUND) ================= */
 const HousePage = () => {
