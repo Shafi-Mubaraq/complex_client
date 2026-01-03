@@ -1,14 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Users, ClipboardList, MessageCircle, Building, Store, Home } from "lucide-react";
 
 import UserManage from "../pages/UserManage";
 import PropertyManage from "./PropertyManage"
 import BookingRequest from "./BookingRequest";
 
-const fullName = sessionStorage.getItem("fullName");
-const mobile = sessionStorage.getItem("mobile");
+
 
 const DashboardPage = () => {
+    const [fullName, setFullName] = useState("");
+    const [mobile, setMobile] = useState("");
+    useEffect(() => {
+        setFullName(sessionStorage.getItem("fullName"));
+        setMobile(sessionStorage.getItem("mobile"))
+    },[])
 
     const [dashboardTab, setDashboardTab] = useState("bookings");
 
