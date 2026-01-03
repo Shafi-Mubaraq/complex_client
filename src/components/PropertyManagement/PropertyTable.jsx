@@ -2,6 +2,7 @@ import React from "react";
 import { Home, IndianRupee, Layers, Maximize2, Edit3, Trash2, CheckCircle2, XCircle } from "lucide-react";
 
 const PropertyTable = ({ properties, onEdit, onDelete }) => {
+
     return (
         <div className="overflow-hidden border border-slate-100 rounded-2xl bg-white shadow-sm mt-6">
             <table className="w-full text-left border-collapse">

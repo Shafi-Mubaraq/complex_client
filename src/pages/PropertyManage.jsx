@@ -1,15 +1,12 @@
-
-
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-// Added missing icons: Search, UserPlus
 import { Search, UserPlus } from "lucide-react";
 import PropertyTable from "../components/PropertyManagement/PropertyTable";
 import PropertyModal from "../components/PropertyManagement/PropertyModal";
 import DeleteModal from "../components/PropertyManagement/DeleteModal";
 
 const PropertyManage = () => {
+
     const apiUrl = import.meta.env.VITE_API_URL;
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -26,7 +23,6 @@ const PropertyManage = () => {
 
     const fetchProperties = async () => {
         try {
-
             const [housesRes, shopsRes] = await Promise.all([
                 axios.get(`${apiUrl}/api/house/fetchData`),
                 axios.get(`${apiUrl}/api/shop/fetchData`),
@@ -34,16 +30,15 @@ const PropertyManage = () => {
             setProperties([...housesRes.data, ...shopsRes.data]);
         } catch (err) {
             console.error("Fetch error", err);
-        } finally {
-            setLoading(false);
-        }
+        } finally { setLoading(false) }
     };
 
     const handleSave = async () => {
+
         try {
+
             const formData = new FormData();
 
-            // Append basic fields
             Object.keys(editData).forEach(key => {
                 if (key === 'amenities' && Array.isArray(editData[key])) {
                     formData.append(key, editData[key].join(","));
@@ -52,10 +47,7 @@ const PropertyManage = () => {
                 }
             });
 
-            // Append files
-            selectedFiles.forEach((file) => {
-                formData.append("images", file);
-            });
+            selectedFiles.forEach((file) => { formData.append("images", file) });
 
             const config = { headers: { "Content-Type": "multipart/form-data" } };
             let res;
@@ -67,9 +59,9 @@ const PropertyManage = () => {
                 res = await axios.post(`${apiUrl}/api/property/create`, formData, config);
                 setProperties(prev => [...prev, res.data.property]);
             }
-
             setEditData(null);
             setSelectedFiles([]);
+
         } catch (err) {
             console.error("SAVE ERROR:", err.response?.data || err.message);
             alert("Save failed: " + (err.response?.data?.message || "Unknown error"));
@@ -105,7 +97,8 @@ const PropertyManage = () => {
     );
 
     return (
-        <div className="p-6 max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto">
+
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-2xl border border-slate-100 mb-6 shadow-sm">
                 <div className="relative w-full md:w-80 group">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />

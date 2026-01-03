@@ -2,13 +2,12 @@ import React from "react";
 import { X, AlertCircle, Trash2, ShieldAlert, Database } from "lucide-react";
 
 const DeleteModal = ({ isOpen, onClose, onConfirm, propertyTitle }) => {
-    // Standardizing visibility check based on your App.js state
+
     if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
 
-            {/* Backdrop consistent with UserModal */}
             <div
                 className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
                 onClick={onClose}

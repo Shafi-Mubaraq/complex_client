@@ -4,6 +4,7 @@ import { X, Building2, Save, Database, ShieldCheck, PlusCircle, Image as ImageIc
 const PROPERTY_KEYS = ["title", "propertyType", "rent", "deposit", "floor", "doorNumber", "area", "location"];
 
 const PropertyModal = ({ editData, setEditData, onSave, onClose, selectedFiles, setSelectedFiles, existingImages }) => {
+
     if (!editData) return null;
 
     const isAddMode = !editData._id;
