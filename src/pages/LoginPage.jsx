@@ -17,7 +17,7 @@ const LoadingSpinner = () => (
     </>
 );
 
-const SignInModal = ({ onClose, onSwitchToSignUp }) => {
+const LoginPage = ({ onClose, onSwitchToSignUp }) => {
 
     const [form, setForm] = useState({ mobile: "", password: "" });
     const [loading, setLoading] = useState(false);
@@ -202,4 +202,4 @@ const SignInModal = ({ onClose, onSwitchToSignUp }) => {
     );
 };
 
-export default SignInModal;
+export default LoginPage;
