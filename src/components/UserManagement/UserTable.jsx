@@ -31,18 +31,18 @@ const UserTable = ({ users, onEdit, onDelete }) => {
                             <td className="px-6 py-5">
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2 text-slate-600">
-                                        <Mail size={14} className="text-slate-300" />
-                                        <span className="text-[12px] font-bold">{u.email}</span>
+                                        <Mail size={14} className="text-slate-400" />
+                                        <span className="text-[13px] font-bold">{u.email}</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-slate-600">
-                                        <Phone size={14} className="text-slate-300" />
-                                        <span className="text-[12px] font-bold">{u.mobile}</span>
+                                        <Phone size={14} className="text-slate-400" />
+                                        <span className="text-[13px] font-bold">{u.mobile}</span>
                                     </div>
                                 </div>
                             </td>
                             <td className="px-6 py-5">
                                 <div className="flex items-center gap-1.5">
-                                    <MapPin size={12} className="text-indigo-400" />
+                                    <MapPin size={14} className="text-indigo-400" />
                                     <span className="text-xs font-black text-slate-700">{u.city}</span>
                                     <span className="text-[12px] font-bold text-slate-400">({u.state})</span>
                                 </div>

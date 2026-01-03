@@ -36,7 +36,7 @@ const PropertyTable = ({ properties, onEdit, onDelete }) => {
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-2 text-slate-600">
                                             <IndianRupee size={14} className="text-emerald-500" />
-                                            <span className="text-[13px] font-bold">Rent: ₹{p.rent}</span>
+                                            <span className="text-[12px] font-bold">Rent: ₹{p.rent}</span>
                                         </div>
                                         <div className="text-[12px] font-bold text-slate-400 uppercase ml-5">
                                             Deposit: ₹{p.deposit}
@@ -50,7 +50,7 @@ const PropertyTable = ({ properties, onEdit, onDelete }) => {
                                             <span className="text-xs font-black text-slate-700">Floor {p.floor}</span>
                                             <span className="text-[12px] font-bold text-slate-400">({p.doorNumber})</span>
                                         </div>
-                                        <div className="text-[13px] font-bold text-slate-500 ml-4">
+                                        <div className="text-[12px] font-bold text-slate-500 ml-4">
                                             {p.location} • {p.area} sq.ft
                                         </div>
                                     </div>

@@ -78,7 +78,6 @@ const PropertyModal = ({ editData, setEditData, onSave, onClose, selectedFiles, 
                                             name={key}
                                             value={editData[key] || ""}
                                             onChange={handleChange}
-                                            placeholder={`Enter ${formatLabel(key).toLowerCase()}`}
                                             className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-medium transition-all duration-200 outline-none placeholder:text-slate-400 focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-600/5"
                                         />
                                     )}
