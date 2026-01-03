@@ -33,6 +33,13 @@ const PropertyModal = ({ house, onClose }) => {
     const submitRequest = async () => {
         setStatus("");
 
+        if (!house.isAvailable) {
+            setStatus("error");
+            alert("This property is no longer available");
+            return;
+        }
+
+
         if (
             !form.fullName ||
             !form.familyType ||
@@ -47,14 +54,33 @@ const PropertyModal = ({ house, onClose }) => {
 
         try {
             setLoading(true);
-            await axios.post(`${apiUrl}/api/propertyRequest/create`, {
+
+            const payload = {
                 property: house.title,
                 propertyType: "house",
-                applicantDetails: form,
+
+                applicantBasic: {
+                    fullName: form.fullName,
+                    phoneNumber: form.phoneNumber,
+                    address: form.address,
+                    aadharNumber: form.aadharNumber,
+                },
+
+                houseDetails: {
+                    familyType: form.familyType,
+                    numberOfMembers: Number(form.numberOfMembers),
+                },
+
                 message: form.message,
-            });
+            };
+
+            await axios.post(
+                `${apiUrl}/api/propertyRequest/create`,
+                payload
+            );
 
             setStatus("success");
+
             setForm({
                 fullName: "",
                 familyType: "",
@@ -67,11 +93,13 @@ const PropertyModal = ({ house, onClose }) => {
 
             setTimeout(() => navigate("/Dashboard"), 1200);
         } catch (err) {
+            console.error(err);
             setStatus("error");
         } finally {
             setLoading(false);
         }
     };
+
 
     return (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
@@ -154,8 +182,8 @@ const PropertyModal = ({ house, onClose }) => {
                                         <option value="joint">Joint</option>
                                         <option value="bachelor">Bachelor</option>
                                     </select>
-                                    <Input name="numberOfMembers" placeholder="Members *" value={form.numberOfMembers} onChange={handleChange} />
-                                    <Input name="phoneNumber" placeholder="Phone *" value={form.phoneNumber} onChange={handleChange} />
+                                    <Input type="number" name="numberOfMembers" placeholder="Members *" value={form.numberOfMembers} onChange={handleChange} />
+                                    <Input type="number" name="phoneNumber" placeholder="Phone *" value={form.phoneNumber} onChange={handleChange} />
                                 </div>
 
                                 <Input className="mt-4" name="address" placeholder="Address *" value={form.address} onChange={handleChange} />
@@ -171,11 +199,10 @@ const PropertyModal = ({ house, onClose }) => {
 
                                 {/* RESPONSE VIEW */}
                                 {status && (
-                                    <div className={`mt-5 p-4 rounded-xl font-semibold flex gap-2 ${
-                                        status === "success"
-                                            ? "bg-green-50 text-green-700"
-                                            : "bg-red-50 text-red-700"
-                                    }`}>
+                                    <div className={`mt-5 p-4 rounded-xl font-semibold flex gap-2 ${status === "success"
+                                        ? "bg-green-50 text-green-700"
+                                        : "bg-red-50 text-red-700"
+                                        }`}>
                                         {status === "success" ? <FaCheckCircle /> : <FaTimesCircle />}
                                         {status === "success"
                                             ? "Request submitted successfully!"
@@ -186,11 +213,10 @@ const PropertyModal = ({ house, onClose }) => {
                                 <button
                                     onClick={submitRequest}
                                     disabled={loading}
-                                    className={`mt-6 w-full py-4 rounded-2xl font-black flex justify-center items-center gap-2 ${
-                                        loading
-                                            ? "bg-gray-300"
-                                            : "bg-indigo-600 hover:bg-indigo-700 text-white"
-                                    }`}
+                                    className={`mt-6 w-full py-4 rounded-2xl font-black flex justify-center items-center gap-2 ${loading
+                                        ? "bg-gray-300"
+                                        : "bg-indigo-600 hover:bg-indigo-700 text-white"
+                                        }`}
                                 >
                                     {loading ? "Submitting..." : "Send Request"}
                                     {!loading && <FaArrowRight />}

@@ -23,13 +23,17 @@ const PropertyModal = ({ property, onClose }) => {
     /* ================= STATE (FORM ONLY) ================= */
     const [formData, setFormData] = useState({
         fullName: "",
-        familyType: "",
-        numberOfMembers: "",
         phoneNumber: "",
         address: "",
         aadharNumber: "",
+        businessName: "",
+        businessType: "",
+        gstNumber: "",
+        numberOfEmployees: "",
+        yearsOfExperience: "",
         message: "",
     });
+
 
     const [errors, setErrors] = useState({});
     const [submitting, setSubmitting] = useState(false);
@@ -48,19 +52,32 @@ const PropertyModal = ({ property, onClose }) => {
         let temp = {};
 
         if (!formData.fullName.trim()) temp.fullName = "Required";
-        if (!formData.familyType) temp.familyType = "Required";
-        if (!formData.numberOfMembers) temp.numberOfMembers = "Required";
         if (!formData.phoneNumber.trim()) temp.phoneNumber = "Required";
-        if (!formData.aadharNumber.trim()) temp.aadharNumber = "Required";
         if (!formData.address.trim()) temp.address = "Required";
-        if (!formData.message.trim()) temp.message = "Required";
+        if (!formData.aadharNumber.trim()) temp.aadharNumber = "Required";
+
+        if (!formData.businessName.trim()) temp.businessName = "Required";
+        if (!formData.businessType.trim()) temp.businessType = "Required";
+        if (!formData.gstNumber.trim()) temp.gstNumber = "Required";
+        if (!formData.numberOfEmployees) temp.numberOfEmployees = "Required";
+        if (!formData.yearsOfExperience) temp.yearsOfExperience = "Required";
 
         setErrors(temp);
         return Object.keys(temp).length === 0;
     };
 
+
     /* ================= SUBMIT ================= */
     const handleSubmitRequest = async () => {
+        setErrorMsg("");
+        setSuccessMsg("");
+
+        // 🔒 availability guard
+        if (!property.isAvailable) {
+            setErrorMsg("This shop is no longer available");
+            return;
+        }
+
         if (!validateForm()) {
             setErrorMsg("Please fill all required fields");
             return;
@@ -69,32 +86,36 @@ const PropertyModal = ({ property, onClose }) => {
         try {
             setSubmitting(true);
 
-            await axios.post(`${apiUrl}/api/propertyRequest/create`, {
+            const payload = {
                 property: property.title,
                 propertyType: "shop",
-                applicantDetails: {
+
+                applicantBasic: {
                     fullName: formData.fullName,
-                    familyType: formData.familyType,
-                    numberOfMembers: formData.numberOfMembers,
                     phoneNumber: formData.phoneNumber,
                     address: formData.address,
                     aadharNumber: formData.aadharNumber,
                 },
+
+                shopDetails: {
+                    businessName: formData.businessName,
+                    businessType: formData.businessType,
+                    gstNumber: formData.gstNumber,
+                    numberOfEmployees: Number(formData.numberOfEmployees),
+                    yearsOfExperience: Number(formData.yearsOfExperience),
+                },
+
                 message: formData.message,
-            });
+            };
+
+            await axios.post(
+                `${apiUrl}/api/propertyRequest/create`,
+                payload
+            );
 
             setSuccessMsg("Request submitted successfully!");
-            setFormData({
-                fullName: "",
-                familyType: "",
-                numberOfMembers: "",
-                phoneNumber: "",
-                address: "",
-                aadharNumber: "",
-                message: "",
-            });
-            navigate("/Dashboard");
             setErrors({});
+            setTimeout(() => navigate("/Dashboard"), 1200);
         } catch (err) {
             console.error(err);
             setErrorMsg("Something went wrong. Please try again.");
@@ -102,6 +123,7 @@ const PropertyModal = ({ property, onClose }) => {
             setSubmitting(false);
         }
     };
+
 
     /* ================= UI ================= */
     return (
@@ -199,12 +221,19 @@ const PropertyModal = ({ property, onClose }) => {
                         {errorMsg && <p className="text-red-600 font-bold mb-3">{errorMsg}</p>}
 
                         <FormInput name="fullName" placeholder="Full Name *" value={formData.fullName} onChange={handleChange} error={errors.fullName} />
-                        <FormSelect value={formData.familyType} onChange={handleChange} error={errors.familyType} />
-                        <FormInput name="numberOfMembers" placeholder="Number of Members *" value={formData.numberOfMembers} onChange={handleChange} error={errors.numberOfMembers} />
                         <FormInput name="phoneNumber" placeholder="Phone Number *" value={formData.phoneNumber} onChange={handleChange} error={errors.phoneNumber} />
-                        <FormInput name="aadharNumber" placeholder="Aadhar Number *" value={formData.aadharNumber} onChange={handleChange} error={errors.aadharNumber} />
                         <FormInput name="address" placeholder="Address *" value={formData.address} onChange={handleChange} error={errors.address} />
-                        <FormInput name="message" placeholder="Message *" value={formData.message} onChange={handleChange} error={errors.message} />
+                        <FormInput name="aadharNumber" placeholder="Aadhar Number *" value={formData.aadharNumber} onChange={handleChange} error={errors.aadharNumber} />
+
+                        <FormInput name="businessName" placeholder="Business Name *" value={formData.businessName} onChange={handleChange} error={errors.businessName} />
+                        <FormInput name="businessType" placeholder="Business Type *" value={formData.businessType} onChange={handleChange} error={errors.businessType} />
+                        <FormInput name="gstNumber" placeholder="GST Number *" value={formData.gstNumber} onChange={handleChange} error={errors.gstNumber} />
+
+                        <FormInput name="numberOfEmployees" type="number" placeholder="Number of Employees *" value={formData.numberOfEmployees} onChange={handleChange} error={errors.numberOfEmployees} />
+                        <FormInput name="yearsOfExperience" type="number" placeholder="Years of Experience *" value={formData.yearsOfExperience} onChange={handleChange} error={errors.yearsOfExperience} />
+
+                        <FormInput name="message" placeholder="Message (Optional)" value={formData.message} onChange={handleChange} />
+
 
                         <button
                             disabled={submitting}
@@ -234,9 +263,10 @@ const Info = ({ icon, label, value }) => (
     </div>
 );
 
-const FormInput = ({ name, placeholder, value, onChange, error }) => (
+const FormInput = ({ name, placeholder, value, onChange, error, type = "text" }) => (
     <div className="mb-3">
         <input
+            type={type}
             name={name}
             value={value}
             placeholder={placeholder}
@@ -246,33 +276,6 @@ const FormInput = ({ name, placeholder, value, onChange, error }) => (
         {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
     </div>
 );
-
-const FormSelect = ({ value, onChange, error }) => (
-    <div className="mb-3">
-        <select
-            name="familyType"
-            value={value}
-            onChange={onChange}
-            className={`w-full border p-3 rounded-xl ${error && "border-red-500"}`}
-        >
-            <option value="">Family Type *</option>
-            <option value="nuclear">Nuclear</option>
-            <option value="joint">Joint</option>
-            <option value="bachelor">Bachelor</option>
-        </select>
-        {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
-    </div>
-);
-
-
-
-
-
-
-
-
-
-
 
 
 /* ================= SHOPS PAGE (SAME AS HOUSE PAGE) ================= */
