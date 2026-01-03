@@ -1,21 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import CustomInput from "../components/Common/CustomInput";
 import { FaLock, FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
-import axios from "axios";
-import { ArrowRight, LogIn } from "lucide-react";
+import { ArrowRight, LogIn, ChevronRight, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-const THEME = {
-    ACCENT: "bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-500/40 text-white",
-    LINK: "text-blue-600 hover:text-blue-800 font-bold",
-};
-
-const LoadingSpinner = () => (
-    <>
-        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-        Signing In...
-    </>
-);
+import axios from "axios";
+import CustomInput from "../components/Common/CustomInput";
 
 const LoginPage = ({ onClose, onSwitchToSignUp }) => {
 
@@ -23,10 +11,8 @@ const LoginPage = ({ onClose, onSwitchToSignUp }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
-
     const mobileInputRef = useRef(null);
-    const navigate = useNavigate(); // ✅ NEW
-
+    const navigate = useNavigate();
     const apiUrl = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
@@ -39,164 +25,135 @@ const LoginPage = ({ onClose, onSwitchToSignUp }) => {
     };
 
     const loginUser = async (e) => {
-        e.preventDefault();
 
+        e.preventDefault();
         if (!form.mobile.trim() || !form.password.trim()) {
-            setError("Mobile and Password are required.");
+            setError("Credentials are required.");
             return;
         }
 
         setLoading(true);
-
         try {
             const res = await axios.post(`${apiUrl}/api/auth/signin`, form);
-
             if (res.status === 200) {
                 const { token, fullName, mobile, role } = res.data;
-
-                // ✅ SAME STORAGE LOGIC
                 sessionStorage.setItem("token", token);
                 sessionStorage.setItem("fullName", fullName);
                 sessionStorage.setItem("mobile", mobile);
                 sessionStorage.setItem("role", role);
-
-                // ✅ ONLY ADDITION
                 navigate("/dashboard");
             }
-
         } catch (err) {
-            setError(
-                err.response?.data?.message || "Invalid mobile or password."
-            );
-        }
-
-        setLoading(false);
+            setError(err.response?.data?.message || "Invalid mobile or password.");
+        } finally { setLoading(false) }
     };
 
     return (
-        <div
-            className="flex justify-center mt-8"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="login-title"
-        >
-            <div className="relative max-w-md w-full p-6 bg-white rounded-xl shadow-2xl border border-gray-100">
+        <div className="flex justify-center items-center">
+            <div className="relative max-w-[440px] w-full bg-white rounded-[2rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] border border-slate-100 overflow-hidden">
 
-                {/* HEADER */}
-                <div className="text-center mb-5">
-                    <h2
-                        id="login-title"
-                        className="text-3xl mt-3 font-extrabold text-gray-900 tracking-tight mb-3"
-                    >
-                        Secure Login
-                    </h2>
-                    <p className="text-sm text-gray-500 mt-1">
-                        Access your dashboard.
-                    </p>
-                </div>
+                {/* Visual Branding Element */}
+                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 via-purple-700 to-indigo-600"></div>
 
-                {/* FORM */}
-                <form className="space-y-6" onSubmit={loginUser}>
-                    <CustomInput
-                        ref={mobileInputRef}
-                        name="mobile"
-                        type="text"
-                        placeholder="Mobile Number"
-                        icon={FaUser}
-                        value={form.mobile}
-                        onChange={handleChange}
-                        required
-                    />
+                <div className="p-10 pt-12">
+                    {/* Header: Matching the Logo Group Style */}
+                    <div className="flex flex-col items-center text-center mb-6">
+                        <div className="w-14 h-14 bg-indigo-700 rounded-2xl flex items-center justify-center mb-5 shadow-lg shadow-slate-200">
+                            <ShieldCheck className="w-8 h-8 text-white" />
+                        </div>
+                        <h2 className="text-3xl font-black tracking-tighter text-slate-900 leading-none">
+                            Secure <span className="text-indigo-600">Login</span>
+                        </h2>
+                        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-3">
+                            T.N.S Complex Platform
+                        </p>
+                    </div>
 
-                    <div className="relative">
-                        <CustomInput
-                            name="password"
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Password"
-                            icon={FaLock}
-                            value={form.password}
-                            onChange={handleChange}
-                            required
-                        />
+                    {/* FORM */}
+                    <form className="space-y-5" onSubmit={loginUser}>
+                        <div className="space-y-1.5">
+                            <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-slate-400">Mobile Number</label>
+                            <CustomInput
+                                ref={mobileInputRef}
+                                name="mobile"
+                                type="text"
+                                placeholder="Enter registered mobile"
+                                icon={FaUser}
+                                value={form.mobile}
+                                onChange={handleChange}
+                                required
+                                className="w-full bg-slate-50 border-slate-200 rounded-xl focus:bg-white transition-all"
+                            />
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <div className="flex justify-between items-center px-1">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Password</label>
+                                <button type="button" className="text-[10px] font-bold text-indigo-500 hover:text-slate-900 transition-colors uppercase tracking-tighter">Forgot?</button>
+                            </div>
+                            <div className="relative">
+                                <CustomInput
+                                    name="password"
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder="••••••••"
+                                    icon={FaLock}
+                                    value={form.password}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full bg-slate-50 border-slate-200 rounded-xl focus:bg-white transition-all"
+                                />
+                                <button
+                                    type="button"
+                                    className="absolute top-1/2 right-4 transform -translate-y-1/2 text-slate-300 hover:text-indigo-600 transition-colors"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                                </button>
+                            </div>
+                        </div>
+
+                        {error && (
+                            <div className="bg-rose-50 border border-rose-100 p-3 rounded-xl flex items-center gap-2 animate-shake">
+                                <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                                <p className="text-xs font-bold text-rose-600 uppercase tracking-tight">{error}</p>
+                            </div>
+                        )}
+
                         <button
-                            type="button"
-                            className="absolute top-1/2 right-4 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
-                            onClick={() => setShowPassword(!showPassword)}
+                            type="submit"
+                            disabled={loading}
+                            className="w-full mt-8 bg-indigo-700 text-white flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-sm transition-all hover:bg-indigo-600 active:scale-[0.98] shadow-xl shadow-slate-200 disabled:opacity-50"
                         >
-                            {showPassword ? (
-                                <FaEyeSlash className="w-5 h-5" />
+                            {loading ? (
+                                <div className="flex items-center gap-2">
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    <span className="uppercase tracking-widest text-[10px]">Verifying...</span>
+                                </div>
                             ) : (
-                                <FaEye className="w-5 h-5" />
+                                <>
+                                    <LogIn size={18} />
+                                    SIGN IN
+                                    <ChevronRight size={16} className="opacity-50" />
+                                </>
                             )}
                         </button>
-                    </div>
+                    </form>
 
-                    {error && (
-                        <p className="text-sm text-red-500 font-medium -mt-2">
-                            {error}
+                    {/* FOOTER */}
+                    <div className="mt-10 pt-8 border-t border-slate-100 text-center">
+                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                            New Partner?
                         </p>
-                    )}
-
-                    <div className="text-right -mt-2">
-                        <a
-                            href="#"
-                            className="text-xs text-gray-500 hover:text-blue-600 transition"
+                        <button
+                            type="button"
+                            className="mt-3 group flex items-center justify-center gap-2 mx-auto text-sm font-black text-indigo-600 hover:text-slate-900 transition-all"
+                            onClick={onSwitchToSignUp}
                         >
-                            Forgot Password?
-                        </a>
+                            CREATE ACCOUNT
+                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </button>
                     </div>
-
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className={`w-full ${THEME.ACCENT} flex items-center justify-center gap-2 py-2 rounded-lg font-semibold text-base transition duration-300 disabled:opacity-70 disabled:cursor-not-allowed`}
-                    >
-                        {loading ? (
-                            <LoadingSpinner />
-                        ) : (
-                            <>
-                                <LogIn className="w-4 h-4" />
-                                Sign In
-                            </>
-                        )}
-                    </button>
-                </form>
-
-                {/* FOOTER */}
-                <div className="mt-6 pt-4 border-t border-gray-200 text-center">
-                    <p className="text-xs text-gray-600">
-                        Not registered yet?
-                    </p>
-                    <button
-                        type="button"
-                        className={`${THEME.LINK} flex items-center justify-center gap-1 mx-auto mt-1 text-sm`}
-                        onClick={onSwitchToSignUp}
-                    >
-                        Create Account
-                        <ArrowRight className="w-4 h-4" />
-                    </button>
                 </div>
-
-                {/* CLOSE BUTTON */}
-                <button
-                    type="button"
-                    className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 transition p-1 rounded-full hover:bg-gray-100"
-                    onClick={onClose}
-                >
-                    <svg
-                        className="w-6 h-6"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M6 18L18 6M6 6l12 12"
-                        />
-                    </svg>
-                </button>
             </div>
         </div>
     );
