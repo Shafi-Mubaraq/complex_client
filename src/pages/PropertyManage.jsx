@@ -97,38 +97,60 @@ const PropertyManage = () => {
     );
 
     return (
-        <div className="max-w-7xl mx-auto">
+        <div className="space-y-6 bg-white min-h-screen">
 
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-2xl border border-slate-100 mb-6 shadow-sm">
+            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                {/* Search */}
                 <div className="relative w-full md:w-80 group">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                    <Search
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors"
+                        size={18}
+                    />
                     <input
                         type="text"
-                        placeholder="Search properties..."
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 outline-none transition-all"
+                        placeholder="Search directory..."
+                        className="w-full bg-white border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-xs font-bold focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 outline-none transition-all"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
+                {/* Register Button */}
                 <button
-                    onClick={() => setEditData({
-                        title: "", propertyType: "house", rent: "", deposit: "",
-                        floor: "", doorNumber: "", area: "", location: "",
-                        isAvailable: true, amenities: []
-                    })}
-                    className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
+                    onClick={() =>
+                        setEditData({
+                            title: "",
+                            propertyType: "house",
+                            rent: "",
+                            deposit: "",
+                            floor: "",
+                            doorNumber: "",
+                            area: "",
+                            location: "",
+                            isAvailable: true,
+                            amenities: [],
+                        })
+                    }
+                    className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[10px] uppercase tracking-[0.15em] px-6 py-3 rounded-xl shadow-lg shadow-indigo-100 flex items-center justify-center gap-2 transition-all active:scale-95"
                 >
                     <UserPlus size={16} />
                     Register New Property
                 </button>
             </div>
 
+            {/* Property Table */}
             <PropertyTable
                 properties={filteredProperties}
-                onEdit={(p) => { setEditData(p); setExistingImages(p.images || []); }}
-                onDelete={(p) => { setSelectedProperty(p); setDeleteModalOpen(true); }}
+                onEdit={(p) => {
+                    setEditData(p);
+                    setExistingImages(p.images || []);
+                }}
+                onDelete={(p) => {
+                    setSelectedProperty(p);
+                    setDeleteModalOpen(true);
+                }}
             />
 
+            {/* Property Modal */}
             {editData && (
                 <PropertyModal
                     editData={editData}
@@ -141,6 +163,7 @@ const PropertyManage = () => {
                 />
             )}
 
+            {/* Delete Modal */}
             <DeleteModal
                 isOpen={deleteModalOpen}
                 onClose={() => setDeleteModalOpen(false)}
