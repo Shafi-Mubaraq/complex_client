@@ -77,7 +77,6 @@ const DashboardPage = () => {
                             if (item.adminOnly && role !== 0) return null;
                             const isActive = dashboardTab === item.id;
                             const Icon = item.icon;
-
                             return (
                                 <button
                                     key={item.id}
