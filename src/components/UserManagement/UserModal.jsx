@@ -106,7 +106,8 @@ const UserModal = ({ isOpen, onClose, data, onSave, onChange, errors, isAddMode 
                         Discard Changes
                     </button>
                     <button
-                        type="submit"
+                        type="button"
+                        onClick={onSave}
                         className="w-full sm:w-auto flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-lg shadow-indigo-200 active:scale-95"
                     >
                         {isAddMode ? <UserPlus size={18} /> : <Save size={18} />}
