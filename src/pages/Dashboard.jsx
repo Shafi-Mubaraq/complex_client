@@ -3,6 +3,7 @@ import {
     Users, Layout, ClipboardList, MessageCircle, Building,
     Store, Home, ChevronRight, ShieldCheck, BadgeCheck, Settings, Bell, Search
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import UserManage from "../pages/UserManage";
 import PropertyManage from "./PropertyManage";
@@ -14,6 +15,12 @@ const DashboardPage = () => {
     const [mobile, setMobile] = useState("");
     const [role, setRole] = useState(null);
     const [dashboardTab, setDashboardTab] = useState("bookings");
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        sessionStorage.clear();
+        navigate("/login", { replace: true });
+    };
 
     useEffect(() => {
         setFullName(sessionStorage.getItem("fullName"));
@@ -22,7 +29,7 @@ const DashboardPage = () => {
     }, []);
 
     const menuItems = [
-        { id: "bookings", label: "Overview", icon: Layout, adminOnly: false },
+        { id: "bookings", label: "My Portal", icon: Layout, adminOnly: false },
         { id: "users", label: "User Directory", icon: Users, adminOnly: true },
         { id: "property", label: "Property Control", icon: Home, adminOnly: true },
         { id: "bookingRequest", label: "Booking Queue", icon: ClipboardList, adminOnly: true },
@@ -64,12 +71,13 @@ const DashboardPage = () => {
                 </div>
 
                 {/* Navigation: Sidebar Menu */}
-                <div className="bg-white/50 backdrop-blur-sm rounded-3xl p-3 border border-slate-200/50">
-                    <nav className="space-y-2">
+                <div className="bg-white/50 backdrop-blur-sm rounded-3xl p-3 border border-slate-200/50 flex flex-col">
+                    <nav className="space-y-2 flex-1">
                         {menuItems.map((item) => {
                             if (item.adminOnly && role !== 0) return null;
                             const isActive = dashboardTab === item.id;
                             const Icon = item.icon;
+
                             return (
                                 <button
                                     key={item.id}
@@ -80,18 +88,49 @@ const DashboardPage = () => {
                                         }`}
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className={`p-1.5 rounded-lg ${isActive ? "bg-white/20" : "bg-slate-100 group-hover:bg-indigo-50"}`}>
-                                            <Icon size={16} strokeWidth={isActive ? 2.5 : 2} />
+                                        <div className={`p-1.5 rounded-lg ${isActive
+                                            ? "bg-white/20"
+                                            : "bg-slate-100 group-hover:bg-indigo-50"
+                                            }`}>
+                                            <Icon size={16} />
                                         </div>
                                         <span className="text-xs font-black uppercase tracking-wider">
                                             {item.label}
                                         </span>
                                     </div>
-                                    <ChevronRight size={14} className={`transition-all ${isActive ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2"}`} />
+                                    <ChevronRight size={14} className={`transition-all ${isActive ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2"
+                                        }`} />
                                 </button>
                             );
                         })}
                     </nav>
+                    {/* 🔴 LOGOUT BUTTON */}
+                    <div className="pt-3 border-t mt-2 border-slate-200/60">
+                        <button
+                            onClick={handleLogout}
+                            className="w-full group flex items-center justify-between
+                                p-3 rounded-2xl
+                                text-slate-500
+                                bg-white
+                                border border-slate-200/60
+                                hover:border-indigo-300
+                                hover:bg-indigo-50/40
+                                transition-all duration-300"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="p-1.5 rounded-lg bg-slate-100 group-hover:bg-indigo-100 transition-colors">
+                                    <ShieldCheck size={16} className="text-slate-500 group-hover:text-indigo-600" />
+                                </div>
+                                <span className="text-xs font-black uppercase tracking-wider">
+                                    Sign Out
+                                </span>
+                            </div>
+                            <ChevronRight
+                                size={14}
+                                className="opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
+                            />
+                        </button>
+                    </div>
                 </div>
             </div>
 

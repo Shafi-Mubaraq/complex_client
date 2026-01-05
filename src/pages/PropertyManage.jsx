@@ -112,7 +112,7 @@ const PropertyManage = () => {
                 </div>
                 <button
                     onClick={() => setEditData({
-                        title: "", propertyType: "House", rent: "", deposit: "",
+                        title: "", propertyType: "house", rent: "", deposit: "",
                         floor: "", doorNumber: "", area: "", location: "",
                         isAvailable: true, amenities: []
                     })}

@@ -64,13 +64,13 @@ const PropertyModal = ({ editData, setEditData, onSave, onClose, selectedFiles, 
 
                                     {key === "propertyType" ? (
                                         <select
-                                            name={key}
-                                            value={editData[key] || "House"}
+                                            name="propertyType"
+                                            value={editData.propertyType || "house"}
                                             onChange={handleChange}
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-medium transition-all duration-200 outline-none focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-600/5 appearance-none"
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-medium transition-all duration-200 outline-none placeholder:text-slate-400 focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-600/5"   
                                         >
-                                            <option value="House">House</option>
-                                            <option value="Shop">Shop</option>
+                                            <option value="house">House</option>
+                                            <option value="shop">Shop</option>
                                         </select>
                                     ) : (
                                         <input
@@ -96,16 +96,31 @@ const PropertyModal = ({ editData, setEditData, onSave, onClose, selectedFiles, 
                                     <input type="file" multiple onChange={handleFileChange} className="hidden" />
                                 </label>
 
+                                {/* Preview New Images */}
                                 {selectedFiles.length > 0 && (
-                                    <div className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg shadow-md shadow-indigo-100 animate-in fade-in slide-in-from-left-2">
-                                        <span className="text-[10px] font-bold uppercase tracking-widest">{selectedFiles.length} New Photos Selected</span>
+                                    <div className="flex flex-wrap gap-4 mt-4">
+                                        {selectedFiles.map((file, index) => (
+                                            <img
+                                                key={index}
+                                                src={URL.createObjectURL(file)}
+                                                alt="preview"
+                                                className="w-24 h-24 object-cover rounded-xl border"
+                                            />
+                                        ))}
                                     </div>
                                 )}
 
-                                {/* Simple preview for existing images if editing */}
+                                {/* Existing Images */}
                                 {!isAddMode && existingImages?.length > 0 && (
-                                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">
-                                        {existingImages.length} images already on server
+                                    <div className="flex flex-wrap gap-4 mt-4">
+                                        {existingImages.map((img, index) => (
+                                            <img
+                                                key={index}
+                                                src={`${import.meta.env.VITE_API_URL}${img}`}
+                                                alt="existing"
+                                                className="w-24 h-24 object-cover rounded-xl border"
+                                            />
+                                        ))}
                                     </div>
                                 )}
                             </div>
