@@ -6,7 +6,6 @@ import PropertyModal from "../components/PropertyManagement/PropertyModal";
 import DeleteModal from "../components/PropertyManagement/DeleteModal";
 
 const PropertyManage = () => {
-
     const apiUrl = import.meta.env.VITE_API_URL;
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -25,29 +24,29 @@ const PropertyManage = () => {
         try {
             const [housesRes, shopsRes] = await Promise.all([
                 axios.get(`${apiUrl}/api/house/fetchData`),
-                axios.get(`${apiUrl}/api/shop/fetchData`),
+                axios.get(`${apiUrl}/api/shop/fetchData`)
             ]);
             setProperties([...housesRes.data, ...shopsRes.data]);
         } catch (err) {
-            console.error("Fetch error", err);
-        } finally { setLoading(false) }
+            console.error("Fetch error:", err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleSave = async () => {
-
         try {
-
             const formData = new FormData();
 
             Object.keys(editData).forEach(key => {
-                if (key === 'amenities' && Array.isArray(editData[key])) {
+                if (key === "amenities" && Array.isArray(editData[key])) {
                     formData.append(key, editData[key].join(","));
-                } else if (key !== 'images') {
+                } else if (key !== "images") {
                     formData.append(key, editData[key]);
                 }
             });
 
-            selectedFiles.forEach((file) => { formData.append("images", file) });
+            selectedFiles.forEach(file => formData.append("images", file));
 
             const config = { headers: { "Content-Type": "multipart/form-data" } };
             let res;
@@ -59,11 +58,13 @@ const PropertyManage = () => {
                 res = await axios.post(`${apiUrl}/api/property/create`, formData, config);
                 setProperties(prev => [...prev, res.data.property]);
             }
+
             setEditData(null);
             setSelectedFiles([]);
+            setExistingImages([]);
 
         } catch (err) {
-            console.error("SAVE ERROR:", err.response?.data || err.message);
+            console.error("Save error:", err.response?.data || err.message);
             alert("Save failed: " + (err.response?.data?.message || "Unknown error"));
         }
     };
@@ -75,12 +76,12 @@ const PropertyManage = () => {
             setDeleteModalOpen(false);
             setSelectedProperty(null);
         } catch (err) {
-            console.error("Delete error", err);
+            console.error("Delete error:", err);
             alert("Failed to delete property");
         }
     };
 
-    const filteredProperties = properties.filter((p) => {
+    const filteredProperties = properties.filter(p => {
         const searchLower = searchTerm.toLowerCase();
         return (
             p.title?.toLowerCase().includes(searchLower) ||
@@ -97,8 +98,9 @@ const PropertyManage = () => {
     );
 
     return (
-        <div className="space-y-6 bg-white min-h-screen">
+        <div className="space-y-6 bg-white min-h-screen p-6">
 
+            {/* Header */}
             <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
                 {/* Search */}
                 <div className="relative w-full md:w-80 group">
@@ -111,40 +113,38 @@ const PropertyManage = () => {
                         placeholder="Search directory..."
                         className="w-full bg-white border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-xs font-bold focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 outline-none transition-all"
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        onChange={e => setSearchTerm(e.target.value)}
                     />
                 </div>
-                {/* Register Button */}
+
+                {/* Add Property Button */}
                 <button
-                    onClick={() =>
-                        setEditData({
-                            title: "",
-                            propertyType: "house",
-                            rent: "",
-                            deposit: "",
-                            floor: "",
-                            doorNumber: "",
-                            area: "",
-                            location: "",
-                            isAvailable: true,
-                            amenities: [],
-                        })
-                    }
+                    onClick={() => setEditData({
+                        title: "",
+                        propertyType: "house",
+                        rent: "",
+                        deposit: "",
+                        floor: "",
+                        doorNumber: "",
+                        area: "",
+                        location: "",
+                        isAvailable: true,
+                        amenities: [],
+                    })}
                     className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[10px] uppercase tracking-[0.15em] px-6 py-3 rounded-xl shadow-lg shadow-indigo-100 flex items-center justify-center gap-2 transition-all active:scale-95"
                 >
-                    <UserPlus size={16} />
-                    Register New Property
+                    <UserPlus size={16} /> Register New Property
                 </button>
             </div>
 
             {/* Property Table */}
             <PropertyTable
                 properties={filteredProperties}
-                onEdit={(p) => {
+                onEdit={p => {
                     setEditData(p);
                     setExistingImages(p.images || []);
                 }}
-                onDelete={(p) => {
+                onDelete={p => {
                     setSelectedProperty(p);
                     setDeleteModalOpen(true);
                 }}
@@ -160,6 +160,7 @@ const PropertyManage = () => {
                     selectedFiles={selectedFiles}
                     setSelectedFiles={setSelectedFiles}
                     existingImages={existingImages}
+                    setExistingImages={setExistingImages}
                 />
             )}
 

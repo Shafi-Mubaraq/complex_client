@@ -6,13 +6,13 @@ import {
 } from "lucide-react";
 
 const BookingRequest = () => {
-
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [processingId, setProcessingId] = useState(null);
     const [searchContact, setSearchContact] = useState("");
 
+    // Fetch all requests
     const fetchRequests = async () => {
         try {
             const res = await axios.get(`${apiUrl}/api/propertyRequest/all`);
@@ -27,20 +27,23 @@ const BookingRequest = () => {
 
     useEffect(() => { fetchRequests(); }, []);
 
+    // Filter requests by applicant name or phone
     const filteredRequests = useMemo(() => {
-        return requests.filter((req) => {
-            const applicantName = req.applicantBasic?.fullName?.toLowerCase() || "";
-            const phone = req.applicantBasic?.phoneNumber || "";
-            return applicantName.includes(searchContact.toLowerCase()) || phone.includes(searchContact);
+        return requests.filter(req => {
+            const name = req.applicant?.fullName?.toLowerCase() || "";
+            const phone = req.applicant?.phoneNumber || "";
+            return name.includes(searchContact.toLowerCase()) || phone.includes(searchContact);
         });
     }, [searchContact, requests]);
 
+    // Stats calculation
     const stats = useMemo(() => ({
         total: requests.length,
-        pending: requests.filter(r => r.status === 'pending').length,
-        completed: requests.filter(r => r.status !== 'pending').length
+        pending: requests.filter(r => r.status === "pending").length,
+        completed: requests.filter(r => r.status !== "pending").length
     }), [requests]);
 
+    // Accept or Reject handler
     const handleAction = async (id, endpoint) => {
         setProcessingId(id);
         try {
@@ -56,7 +59,7 @@ const BookingRequest = () => {
     if (loading) return <LoadingScreen />;
 
     return (
-        <div className="min-h-screen text-slate-900 font-sans antialiased selection:bg-indigo-100 selection:text-indigo-700">
+        <div className="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased selection:bg-indigo-100 selection:text-indigo-700">
 
             {/* Header */}
             <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
@@ -81,21 +84,21 @@ const BookingRequest = () => {
                             placeholder="Search applicants..."
                             className="w-full pl-12 pr-4 py-2.5 bg-slate-100/50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all outline-none"
                             value={searchContact}
-                            onChange={(e) => setSearchContact(e.target.value)}
+                            onChange={e => setSearchContact(e.target.value)}
                         />
                     </div>
                 </div>
             </header>
 
-            <main className="max-w-[1600px] mx-auto  py-8 space-y-8">
-                {/* Statistics Grid */}
+            <main className="max-w-[1600px] mx-auto py-8 space-y-8">
+                {/* Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <StatCard label="Total Submissions" value={stats.total} icon={<Users className="text-indigo-600" />} />
                     <StatCard label="Pending Review" value={stats.pending} icon={<Clock className="text-amber-500" />} />
                     <StatCard label="Processed" value={stats.completed} icon={<CheckCircle className="text-emerald-500" />} />
                 </div>
 
-                {/* Data Table */}
+                {/* Table */}
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
@@ -109,34 +112,34 @@ const BookingRequest = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {filteredRequests.map((req) => (
+                                {filteredRequests.map(req => (
                                     <tr key={req._id} className="hover:bg-slate-50/80 transition-all duration-200">
+                                        {/* Property */}
                                         <td className="px-8 py-5">
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
-                                                    {req.property} <ArrowUpRight size={14} className="text-slate-300" />
+                                                    {req.property?.title} <ArrowUpRight size={14} className="text-slate-300" />
                                                 </span>
-                                                <span className={`text-[10px] font-bold uppercase mt-1 px-2 py-0.5 rounded w-fit ${req.propertyType === 'house' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'
-                                                    }`}>
+                                                <span className={`text-[10px] font-bold uppercase mt-1 px-2 py-0.5 rounded w-fit ${req.propertyType === 'house' ? 'bg-blue-50 text-blue-600' : 'bg-emerald-50 text-emerald-600'}`}>
                                                     {req.propertyType}
                                                 </span>
                                             </div>
                                         </td>
 
+                                        {/* Applicant */}
                                         <td className="px-8 py-5">
                                             <div className="flex items-center gap-3">
                                                 <div className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600 text-xs border border-slate-200">
-                                                    {req.applicantBasic?.fullName?.charAt(0)}
+                                                    {req.applicant?.fullName?.charAt(0)}
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <p className="font-semibold text-slate-700 text-sm">{req.applicantBasic?.fullName}</p>
-                                                    <p className="text-xs text-slate-400 font-medium">
-                                                        {req.applicantBasic?.phoneNumber}
-                                                    </p>
+                                                    <p className="font-semibold text-slate-700 text-sm">{req.applicant?.fullName}</p>
+                                                    <p className="text-xs text-slate-400 font-medium">{req.applicant?.phoneNumber}</p>
                                                 </div>
                                             </div>
                                         </td>
 
+                                        {/* Usage */}
                                         <td className="px-8 py-5">
                                             {req.propertyType === "house" ? (
                                                 <div className="flex flex-col text-xs text-slate-600 font-medium">
@@ -151,10 +154,12 @@ const BookingRequest = () => {
                                             )}
                                         </td>
 
+                                        {/* Status */}
                                         <td className="px-8 py-5 text-center">
                                             <StatusPill status={req.status} />
                                         </td>
 
+                                        {/* Management */}
                                         <td className="px-8 py-5 text-right">
                                             {req.status === "pending" ? (
                                                 <div className="flex justify-end gap-2">
@@ -162,9 +167,8 @@ const BookingRequest = () => {
                                                         disabled={processingId === req._id}
                                                         onClick={() => handleAction(req._id, "reject")}
                                                         className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
-                                                    >
-                                                        <XCircle size={18} />
-                                                    </button>
+                                                    ><XCircle size={18} /></button>
+
                                                     <button
                                                         disabled={processingId === req._id}
                                                         onClick={() => handleAction(req._id, "accept")}
@@ -175,9 +179,7 @@ const BookingRequest = () => {
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 py-1 border border-slate-100 rounded-md">
-                                                    Archive
-                                                </span>
+                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-3 py-1 border border-slate-100 rounded-md">Archive</span>
                                             )}
                                         </td>
                                     </tr>
@@ -193,16 +195,13 @@ const BookingRequest = () => {
 };
 
 /* --- Sub-Components --- */
-
 const StatCard = ({ label, value, icon }) => (
     <div className="bg-white p-6 rounded-2xl border border-slate-200 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow">
         <div>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em] mb-1">{label}</p>
             <p className="text-3xl font-bold text-slate-900 tracking-tight">{value}</p>
         </div>
-        <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100">
-            {icon}
-        </div>
+        <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100">{icon}</div>
     </div>
 );
 

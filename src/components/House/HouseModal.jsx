@@ -164,7 +164,7 @@ const HouseModal = ({ house, onClose }) => {
                                         name="address"
                                         value={form.address}
                                         onChange={handleChange}
-                                        rows="2"
+                                        rows=""
                                         className={`w-full mt-1 bg-slate-50 border rounded-xl px-4 py-3.5 text-sm font-medium transition-all outline-none resize-none ${errors.address ? 'border-rose-300 ring-4 ring-rose-500/5' : 'border-slate-200 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5'}`}
                                     />
                                     {errors.address && <p className="text-[11px] font-medium text-rose-500 ml-1 animate-in slide-in-from-top-1">{errors.address}</p>}
