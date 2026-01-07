@@ -34,28 +34,57 @@ const PropertyManage = () => {
         }
     };
 
+    // ----------------- HANDLE SAVE -----------------
     const handleSave = async () => {
         try {
             const formData = new FormData();
 
-            Object.keys(editData).forEach(key => {
-                if (key === "amenities" && Array.isArray(editData[key])) {
-                    formData.append(key, editData[key].join(","));
+            // GET LOGGED-IN USER
+            const user = JSON.parse(localStorage.getItem("user"));
+            if (!user?._id) {
+                alert("User not logged in");
+                return;
+            }
+
+            formData.append("owner", user._id);
+
+            Object.entries(editData).forEach(([key, value]) => {
+                if (key === "amenities" && Array.isArray(value)) {
+                    formData.append(key, value.join(","));
                 } else if (key !== "images") {
-                    formData.append(key, editData[key]);
+                    formData.append(key, value ?? "");
                 }
             });
 
-            selectedFiles.forEach(file => formData.append("images", file));
+            // ✅ FIX: Ensure existingImages is always an array
+            formData.append(
+                "existingImages",
+                JSON.stringify(Array.isArray(existingImages) ? existingImages : [])
+            );
+
+            // new images
+            selectedFiles.forEach(file => {
+                formData.append("images", file);
+            });
 
             const config = { headers: { "Content-Type": "multipart/form-data" } };
             let res;
 
             if (editData._id) {
-                res = await axios.put(`${apiUrl}/api/property/update/${editData._id}`, formData, config);
-                setProperties(prev => prev.map(p => p._id === res.data.property._id ? res.data.property : p));
+                res = await axios.put(
+                    `${apiUrl}/api/property/update/${editData._id}`,
+                    formData,
+                    config
+                );
+                setProperties(prev =>
+                    prev.map(p => p._id === res.data.property._id ? res.data.property : p)
+                );
             } else {
-                res = await axios.post(`${apiUrl}/api/property/create`, formData, config);
+                res = await axios.post(
+                    `${apiUrl}/api/property/create`,
+                    formData,
+                    config
+                );
                 setProperties(prev => [...prev, res.data.property]);
             }
 
@@ -64,11 +93,12 @@ const PropertyManage = () => {
             setExistingImages([]);
 
         } catch (err) {
-            console.error("Save error:", err.response?.data || err.message);
-            alert("Save failed: " + (err.response?.data?.message || "Unknown error"));
+            console.error(err);
+            alert(err.response?.data?.message || "Save failed");
         }
     };
 
+    // ----------------- HANDLE DELETE -----------------
     const handleDelete = async () => {
         try {
             await axios.delete(`${apiUrl}/api/property/delete/${selectedProperty._id}`);

@@ -67,7 +67,7 @@ const PropertyModal = ({ editData, setEditData, onSave, onClose, selectedFiles, 
                                             name="propertyType"
                                             value={editData.propertyType || "house"}
                                             onChange={handleChange}
-                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-medium transition-all duration-200 outline-none placeholder:text-slate-400 focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-600/5"   
+                                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-medium transition-all duration-200 outline-none placeholder:text-slate-400 focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-600/5"
                                         >
                                             <option value="house">House</option>
                                             <option value="shop">Shop</option>
@@ -110,19 +110,33 @@ const PropertyModal = ({ editData, setEditData, onSave, onClose, selectedFiles, 
                                     </div>
                                 )}
 
-                                {/* Existing Images */}
                                 {!isAddMode && existingImages?.length > 0 && (
                                     <div className="flex flex-wrap gap-4 mt-4">
                                         {existingImages.map((img, index) => (
-                                            <img
-                                                key={index}
-                                                src={`${import.meta.env.VITE_API_URL}${img}`}
-                                                alt="existing"
-                                                className="w-24 h-24 object-cover rounded-xl border"
-                                            />
+                                            <div key={index} className="relative">
+                                                <img
+                                                    src={`${import.meta.env.VITE_API_URL}${img}`}
+                                                    alt="existing"
+                                                    className="w-24 h-24 object-cover rounded-xl border"
+                                                />
+
+                                                {/* ❌ Remove Image Button */}
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setExistingImages(prev =>
+                                                            prev.filter((_, i) => i !== index)
+                                                        )
+                                                    }
+                                                    className="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full p-1 shadow"
+                                                >
+                                                    <X size={12} />
+                                                </button>
+                                            </div>
                                         ))}
                                     </div>
                                 )}
+
                             </div>
                         </div>
 
