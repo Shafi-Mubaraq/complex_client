@@ -72,10 +72,9 @@ const HousePage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
                     {houses.map(house => (
                         <HouseCard
-                            key={house._id}
                             house={house}
                             apiUrl={apiUrl}
-                            onView={(houseData) => setSelectedHouse(houseData)}
+                            onView={() => setSelectedHouse(house)}
                         />
                     ))}
                 </div>

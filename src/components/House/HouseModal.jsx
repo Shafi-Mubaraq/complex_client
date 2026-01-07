@@ -44,33 +44,44 @@ const HouseModal = ({ house, onClose }) => {
         if (errors[e.target.name]) setErrors({ ...errors, [e.target.name]: "" });
     };
 
-    const submitRequest = async (e) => {
-        e.preventDefault();
-        if (!validate()) return;
+const submitRequest = async (e) => {
+  e.preventDefault();
+  if (!validate()) return;
 
-        try {
-            setLoading(true);
-            const payload = {
-                property: house.title,
-                propertyType: "house",
-                applicantBasic: {
-                    fullName: form.fullName, phoneNumber: form.phoneNumber,
-                    address: form.address, aadharNumber: form.aadharNumber,
-                },
-                houseDetails: {
-                    familyType: form.familyType,
-                    numberOfMembers: Number(form.numberOfMembers),
-                },
-                message: form.message,
-            };
-            await axios.post(`${apiUrl}/api/propertyRequest/create`, payload);
-            setStatus("success");
-            setTimeout(() => navigate("/Dashboard"), 1500);
-        } catch (err) {
-            console.error('Error in submitting request : ', err)
-            setStatus("error");
-        } finally { setLoading(false); }
+  try {
+    setLoading(true);
+
+    const payload = {
+      property: house._id,
+      propertyType: "house",
+
+      applicant: {
+        fullName: form.fullName,
+        phoneNumber: form.phoneNumber,
+        address: form.address,
+        aadharNumber: form.aadharNumber
+      },
+
+      houseDetails: {
+        familyType: form.familyType,
+        numberOfMembers: Number(form.numberOfMembers)
+      },
+
+      message: form.message
     };
+
+    await axios.post(`${apiUrl}/api/propertyRequest/create`, payload);
+
+    setStatus("success");
+    setTimeout(() => onClose(), 1200);
+
+  } catch (err) {
+    setStatus("error");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -123,9 +134,13 @@ const HouseModal = ({ house, onClose }) => {
 
                     <form onSubmit={submitRequest} noValidate className="flex-1 overflow-y-auto p-10 hide-scrollbar">
                         <div className="grid grid-cols-3 gap-4 mb-10">
-                            <QuickStat label="Rent/Mo" value={`₹${house.rent}`} />
-                            <QuickStat label="Deposit" value={`₹${house.deposit}`} />
-                            <QuickStat label="Area" value={`${house.area} ft²`} />
+<QuickStat label="Rent / Month" value={`₹${house.rent}`} />
+<QuickStat label="Deposit" value={`₹${house.deposit}`} />
+<QuickStat label="Area" value={`${house.area} sq.ft`} />
+<QuickStat label="Floor" value={house.floor || "—"} />
+<QuickStat label="Door No" value={house.doorNumber || "—"} />
+<QuickStat label="Status" value={house.isAvailable ? "Available" : "Occupied"} />
+
                         </div>
 
                         <div className="space-y-8">
@@ -164,7 +179,7 @@ const HouseModal = ({ house, onClose }) => {
                                         name="address"
                                         value={form.address}
                                         onChange={handleChange}
-                                        rows=""
+                                        rows="2"
                                         className={`w-full mt-1 bg-slate-50 border rounded-xl px-4 py-3.5 text-sm font-medium transition-all outline-none resize-none ${errors.address ? 'border-rose-300 ring-4 ring-rose-500/5' : 'border-slate-200 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5'}`}
                                     />
                                     {errors.address && <p className="text-[11px] font-medium text-rose-500 ml-1 animate-in slide-in-from-top-1">{errors.address}</p>}
@@ -240,3 +255,124 @@ const InputField = ({ label, error, fullWidth, ...props }) => (
 );
 
 export default HouseModal;
+
+
+// import React, { useState } from "react";
+// import axios from "axios";
+// import { X, MapPin, Send, AlertCircle, Home, UserPlus, Database, ShieldCheck } from "lucide-react";
+// import { useNavigate } from "react-router-dom";
+
+// const HouseModal = ({ house, onClose }) => {
+//     const navigate = useNavigate();
+//     const apiUrl = import.meta.env.VITE_API_URL?.trim() || "http://localhost:5000";
+
+//     const [form, setForm] = useState({
+//         fullName: "", familyType: "", numberOfMembers: "",
+//         phoneNumber: "", address: "", aadharNumber: "", message: "",
+//     });
+
+//     const [errors, setErrors] = useState({});
+//     const [status, setStatus] = useState("");
+//     const [loading, setLoading] = useState(false);
+
+//     if (!house) return null;
+
+//     const validate = () => {
+//         let newErrors = {};
+//         if (!form.fullName.trim()) newErrors.fullName = "Required";
+//         if (!/^[6-9]\d{9}$/.test(form.phoneNumber)) newErrors.phoneNumber = "Invalid number";
+//         if (!/^\d{12}$/.test(form.aadharNumber)) newErrors.aadharNumber = "Invalid Aadhar";
+//         setErrors(newErrors);
+//         return Object.keys(newErrors).length === 0;
+//     };
+
+//     const submitRequest = async (e) => {
+//         e.preventDefault();
+//         if (!validate()) return;
+//         try {
+//             setLoading(true);
+//             const payload = {
+//                 property: house.title,
+//                 propertyType: "house",
+//                 applicantBasic: { ...form },
+//                 houseDetails: { familyType: form.familyType, numberOfMembers: Number(form.numberOfMembers) },
+//             };
+//             await axios.post(`${apiUrl}/api/propertyRequest/create`, payload);
+//             setStatus("success");
+//             setTimeout(() => navigate("/Dashboard"), 1500);
+//         } catch (err) {
+//             setStatus("error");
+//         } finally { setLoading(false); }
+//     };
+
+//     return (
+//         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+//             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
+//             <div className="relative bg-white w-full max-w-5xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col lg:flex-row animate-in fade-in zoom-in duration-200">
+                
+//                 {/* Left Side: Asset Summary */}
+//                 <div className="lg:w-5/12 bg-slate-50 overflow-y-auto border-r border-slate-100 p-8">
+//                     <div className="mb-6">
+//                         <div className="flex items-center gap-2 text-indigo-600 mb-2">
+//                             <Home size={16} />
+//                             <span className="text-[10px] font-black uppercase tracking-[0.2em]">Asset Detail</span>
+//                         </div>
+//                         <h2 className="text-2xl font-bold text-slate-900 tracking-tight">{house.title}</h2>
+//                         <div className="flex items-center gap-1.5 text-slate-500 mt-2">
+//                             <MapPin size={14} />
+//                             <span className="text-xs font-semibold">{house.location}</span>
+//                         </div>
+//                     </div>
+
+//                     <div className="grid grid-cols-1 gap-4 mb-6">
+//                         <div className="bg-white p-4 rounded-xl border border-slate-200">
+//                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Pricing & Size</p>
+//                             <div className="mt-2 space-y-1">
+//                                 <p className="text-sm font-bold text-slate-700">Rent: ₹{house.rent}/mo</p>
+//                                 <p className="text-sm font-bold text-slate-700">Deposit: ₹{house.deposit}</p>
+//                                 <p className="text-sm font-bold text-slate-700">Area: {house.area} sq.ft</p>
+//                             </div>
+//                         </div>
+//                     </div>
+
+//                     {house.images?.slice(0, 1).map((img, i) => (
+//                         <div key={i} className="rounded-xl overflow-hidden border border-slate-200 p-1 bg-white">
+//                             <img src={`${apiUrl}${img}`} className="w-full h-48 object-cover rounded-lg" alt="Asset" />
+//                         </div>
+//                     ))}
+//                 </div>
+
+//                 {/* Right Side: Form */}
+//                 <div className="lg:w-7/12 flex flex-col bg-white">
+//                     <div className="px-10 py-6 border-b border-slate-100 flex justify-between items-center">
+//                         <div className="flex items-center gap-4">
+//                             <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+//                                 <UserPlus size={20} />
+//                             </div>
+//                             <h3 className="text-lg font-bold text-slate-900 uppercase">Lease Application</h3>
+//                         </div>
+//                         <button onClick={onClose} className="text-slate-400 hover:bg-slate-50 p-2 rounded-full"><X size={20} /></button>
+//                     </div>
+
+//                     <form className="flex-1 overflow-y-auto p-10 space-y-6">
+//                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                             <div className="space-y-2">
+//                                 <label className="text-[11px] font-bold uppercase text-slate-600">Full Name</label>
+//                                 <input className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm" name="fullName" onChange={(e) => setForm({...form, fullName: e.target.value})} />
+//                             </div>
+//                             <div className="space-y-2">
+//                                 <label className="text-[11px] font-bold uppercase text-slate-600">Phone</label>
+//                                 <input className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm" name="phoneNumber" onChange={(e) => setForm({...form, phoneNumber: e.target.value})} />
+//                             </div>
+//                         </div>
+//                         <button onClick={submitRequest} disabled={loading} className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold text-[11px] uppercase tracking-widest hover:bg-indigo-600 transition-all">
+//                             {loading ? "Processing..." : "Submit Lease Request"}
+//                         </button>
+//                     </form>
+//                 </div>
+//             </div>
+//         </div>
+//     );
+// };
+
+// export default HouseModal;
