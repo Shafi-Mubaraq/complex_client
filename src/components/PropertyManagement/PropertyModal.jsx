@@ -9,13 +9,6 @@ const PropertyModal = ({ editData, setEditData, onSave, onClose, selectedFiles, 
 
     const isAddMode = !editData._id;
 
-    // const handleChange = (e) => {
-    //     const { name, value, type, checked } = e.target;
-    //     setEditData(prev => ({
-    //         ...prev,
-    //         [name]: type === "checkbox" ? checked : value
-    //     }));
-    // };
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         setEditData(prev => ({
@@ -31,6 +24,7 @@ const PropertyModal = ({ editData, setEditData, onSave, onClose, selectedFiles, 
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+
             {/* Backdrop */}
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
 
@@ -129,11 +123,7 @@ const PropertyModal = ({ editData, setEditData, onSave, onClose, selectedFiles, 
                                                 {/* ❌ Remove Image Button */}
                                                 <button
                                                     type="button"
-                                                    onClick={() =>
-                                                        setExistingImages(prev =>
-                                                            prev.filter((_, i) => i !== index)
-                                                        )
-                                                    }
+                                                    onClick={() => setExistingImages(prev => prev.filter((_, i) => i !== index))}
                                                     className="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full p-1 shadow"
                                                 >
                                                     <X size={12} />

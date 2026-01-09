@@ -6,6 +6,7 @@ import PropertyModal from "../components/PropertyManagement/PropertyModal";
 import DeleteModal from "../components/PropertyManagement/DeleteModal";
 
 const PropertyManage = () => {
+
     const apiUrl = import.meta.env.VITE_API_URL;
     const [properties, setProperties] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -29,71 +30,45 @@ const PropertyManage = () => {
             setProperties([...housesRes.data, ...shopsRes.data]);
         } catch (err) {
             console.error("Fetch error:", err);
-        } finally {
-            setLoading(false);
+        } finally { setLoading(false) }
+    };
+
+    const handleSave = async () => {
+
+        try {
+
+            const formData = new FormData();
+            formData.append("title", editData.title);
+            formData.append("propertyType", editData.propertyType === "shop" ? "shop" : "house");
+            formData.append("rent", Number(editData.rent) || 0);
+            formData.append("deposit", Number(editData.deposit) || 0);
+            formData.append("floor", editData.floor || "");
+            formData.append("doorNumber", editData.doorNumber || "");
+            formData.append("area", Number(editData.area) || 0);
+            formData.append("location", editData.location);
+            formData.append("isAvailable", editData.isAvailable);
+            formData.append("amenities", Array.isArray(editData.amenities) ? editData.amenities.join(",") : "");
+            formData.append("existingImages", JSON.stringify(existingImages || []));
+            selectedFiles.forEach(file => { formData.append("images", file) });
+            const config = { headers: { "Content-Type": "multipart/form-data" } };
+            let res;
+            if (editData._id) {
+                res = await axios.put(`${apiUrl}/api/property/update/${editData._id}`, formData, config);
+                setProperties(prev => prev.map(p => p._id === res.data.property._id ? res.data.property : p));
+            } else {
+                res = await axios.post(`${apiUrl}/api/property/create`, formData, config);
+                setProperties(prev => [res.data.property, ...prev]);
+            }
+            setEditData(null);
+            setSelectedFiles([]);
+            setExistingImages([]);
+            alert("Success! Property Registered.");
+        } catch (err) {
+            console.error("Error details:", err.response?.data);
+            alert(err.response?.data?.message || "Check if Title, Rent, and Location are filled correctly.");
         }
     };
 
-const handleSave = async () => {
-    try {
-        const formData = new FormData();
-
-        // 1. GET USER SAFELY
-        const rawUser = localStorage.getItem("user");
-        
-        // If storage is empty or contains the literal string "undefined"
-        if (!rawUser || rawUser === "undefined") {
-            alert("Your session has expired. Please log out and log back in.");
-            return; 
-        }
-
-        const user = JSON.parse(rawUser);
-        
-        // 2. BUILD FORM DATA
-        formData.append("owner", user._id);
-        formData.append("title", editData.title);
-        formData.append("propertyType", editData.propertyType || "house");
-        formData.append("rent", Number(editData.rent) || 0);
-        formData.append("deposit", Number(editData.deposit) || 0);
-        formData.append("floor", editData.floor || "");
-        formData.append("doorNumber", editData.doorNumber || "");
-        formData.append("area", Number(editData.area) || 0);
-        formData.append("location", editData.location);
-        formData.append("isAvailable", editData.isAvailable);
-
-        // Amenities
-        formData.append("amenities", Array.isArray(editData.amenities) ? editData.amenities.join(",") : "");
-
-        // Images
-        formData.append("existingImages", JSON.stringify(existingImages || []));
-        selectedFiles.forEach(file => {
-            formData.append("images", file);
-        });
-
-        const config = { headers: { "Content-Type": "multipart/form-data" } };
-        
-        // 3. SEND TO BACKEND
-        let res;
-        if (editData._id) {
-            res = await axios.put(`${apiUrl}/api/property/update/${editData._id}`, formData, config);
-            setProperties(prev => prev.map(p => p._id === res.data.property._id ? res.data.property : p));
-        } else {
-            res = await axios.post(`${apiUrl}/api/property/create`, formData, config);
-            setProperties(prev => [res.data.property, ...prev]);
-        }
-
-        // 4. CLEANUP
-        setEditData(null);
-        setSelectedFiles([]);
-        setExistingImages([]);
-        alert("Success! Property Registered.");
-
-    } catch (err) {
-        console.error("Error details:", err.response?.data);
-        alert(err.response?.data?.message || "Check if Title, Rent, and Location are filled correctly.");
-    }
-};
-    // ----------------- HANDLE DELETE -----------------
     const handleDelete = async () => {
         try {
             await axios.delete(`${apiUrl}/api/property/delete/${selectedProperty._id}`);
@@ -144,18 +119,18 @@ const handleSave = async () => {
 
                 {/* Add Property Button */}
                 <button
-                   onClick={() => setEditData({
-    title: "",
-    propertyType: "house", // Make sure this matches your backend enum exactly (lowercase)
-    rent: "",
-    deposit: "",
-    floor: "",
-    doorNumber: "",
-    area: "",
-    location: "",
-    isAvailable: true,
-    amenities: [],
-})}
+                    onClick={() => setEditData({
+                        title: "",
+                        propertyType: "house",
+                        rent: "",
+                        deposit: "",
+                        floor: "",
+                        doorNumber: "",
+                        area: "",
+                        location: "",
+                        isAvailable: true,
+                        amenities: [],
+                    })}
                     className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[10px] uppercase tracking-[0.15em] px-6 py-3 rounded-xl shadow-lg shadow-indigo-100 flex items-center justify-center gap-2 transition-all active:scale-95"
                 >
                     <UserPlus size={16} /> Register New Property
