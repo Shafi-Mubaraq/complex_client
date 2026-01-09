@@ -34,70 +34,65 @@ const PropertyManage = () => {
         }
     };
 
-    // ----------------- HANDLE SAVE -----------------
-    const handleSave = async () => {
-        try {
-            const formData = new FormData();
+const handleSave = async () => {
+    try {
+        const formData = new FormData();
 
-            // GET LOGGED-IN USER
-            const user = JSON.parse(localStorage.getItem("user"));
-            if (!user?._id) {
-                alert("User not logged in");
-                return;
-            }
-
-            formData.append("owner", user._id);
-
-            Object.entries(editData).forEach(([key, value]) => {
-                if (key === "amenities" && Array.isArray(value)) {
-                    formData.append(key, value.join(","));
-                } else if (key !== "images") {
-                    formData.append(key, value ?? "");
-                }
-            });
-
-            // ✅ FIX: Ensure existingImages is always an array
-            formData.append(
-                "existingImages",
-                JSON.stringify(Array.isArray(existingImages) ? existingImages : [])
-            );
-
-            // new images
-            selectedFiles.forEach(file => {
-                formData.append("images", file);
-            });
-
-            const config = { headers: { "Content-Type": "multipart/form-data" } };
-            let res;
-
-            if (editData._id) {
-                res = await axios.put(
-                    `${apiUrl}/api/property/update/${editData._id}`,
-                    formData,
-                    config
-                );
-                setProperties(prev =>
-                    prev.map(p => p._id === res.data.property._id ? res.data.property : p)
-                );
-            } else {
-                res = await axios.post(
-                    `${apiUrl}/api/property/create`,
-                    formData,
-                    config
-                );
-                setProperties(prev => [...prev, res.data.property]);
-            }
-
-            setEditData(null);
-            setSelectedFiles([]);
-            setExistingImages([]);
-
-        } catch (err) {
-            console.error(err);
-            alert(err.response?.data?.message || "Save failed");
+        // 1. GET USER SAFELY
+        const rawUser = localStorage.getItem("user");
+        
+        // If storage is empty or contains the literal string "undefined"
+        if (!rawUser || rawUser === "undefined") {
+            alert("Your session has expired. Please log out and log back in.");
+            return; 
         }
-    };
 
+        const user = JSON.parse(rawUser);
+        
+        // 2. BUILD FORM DATA
+        formData.append("owner", user._id);
+        formData.append("title", editData.title);
+        formData.append("propertyType", editData.propertyType || "house");
+        formData.append("rent", Number(editData.rent) || 0);
+        formData.append("deposit", Number(editData.deposit) || 0);
+        formData.append("floor", editData.floor || "");
+        formData.append("doorNumber", editData.doorNumber || "");
+        formData.append("area", Number(editData.area) || 0);
+        formData.append("location", editData.location);
+        formData.append("isAvailable", editData.isAvailable);
+
+        // Amenities
+        formData.append("amenities", Array.isArray(editData.amenities) ? editData.amenities.join(",") : "");
+
+        // Images
+        formData.append("existingImages", JSON.stringify(existingImages || []));
+        selectedFiles.forEach(file => {
+            formData.append("images", file);
+        });
+
+        const config = { headers: { "Content-Type": "multipart/form-data" } };
+        
+        // 3. SEND TO BACKEND
+        let res;
+        if (editData._id) {
+            res = await axios.put(`${apiUrl}/api/property/update/${editData._id}`, formData, config);
+            setProperties(prev => prev.map(p => p._id === res.data.property._id ? res.data.property : p));
+        } else {
+            res = await axios.post(`${apiUrl}/api/property/create`, formData, config);
+            setProperties(prev => [res.data.property, ...prev]);
+        }
+
+        // 4. CLEANUP
+        setEditData(null);
+        setSelectedFiles([]);
+        setExistingImages([]);
+        alert("Success! Property Registered.");
+
+    } catch (err) {
+        console.error("Error details:", err.response?.data);
+        alert(err.response?.data?.message || "Check if Title, Rent, and Location are filled correctly.");
+    }
+};
     // ----------------- HANDLE DELETE -----------------
     const handleDelete = async () => {
         try {
@@ -149,18 +144,18 @@ const PropertyManage = () => {
 
                 {/* Add Property Button */}
                 <button
-                    onClick={() => setEditData({
-                        title: "",
-                        propertyType: "house",
-                        rent: "",
-                        deposit: "",
-                        floor: "",
-                        doorNumber: "",
-                        area: "",
-                        location: "",
-                        isAvailable: true,
-                        amenities: [],
-                    })}
+                   onClick={() => setEditData({
+    title: "",
+    propertyType: "house", // Make sure this matches your backend enum exactly (lowercase)
+    rent: "",
+    deposit: "",
+    floor: "",
+    doorNumber: "",
+    area: "",
+    location: "",
+    isAvailable: true,
+    amenities: [],
+})}
                     className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[10px] uppercase tracking-[0.15em] px-6 py-3 rounded-xl shadow-lg shadow-indigo-100 flex items-center justify-center gap-2 transition-all active:scale-95"
                 >
                     <UserPlus size={16} /> Register New Property

@@ -9,14 +9,20 @@ const PropertyModal = ({ editData, setEditData, onSave, onClose, selectedFiles, 
 
     const isAddMode = !editData._id;
 
+    // const handleChange = (e) => {
+    //     const { name, value, type, checked } = e.target;
+    //     setEditData(prev => ({
+    //         ...prev,
+    //         [name]: type === "checkbox" ? checked : value
+    //     }));
+    // };
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         setEditData(prev => ({
             ...prev,
-            [name]: type === "checkbox" ? checked : value
+            [name]: type === "checkbox" ? checked : (type === "number" ? (value === "" ? "" : Number(value)) : value)
         }));
     };
-
     const handleFileChange = (e) => {
         setSelectedFiles(Array.from(e.target.files));
     };
