@@ -93,7 +93,7 @@ function OverLayout() {
                                     Sign In
                                 </button>
                                 <button
-                                    onClick={() => navigate("/signup")}
+                                    onClick={() => navigate("/register")}
                                     className="px-6 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-full hover:bg-slate-900 transition-all active:scale-95 shadow-lg shadow-indigo-100"
                                 >
                                     Join Now

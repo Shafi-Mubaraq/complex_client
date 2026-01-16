@@ -54,6 +54,7 @@ import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
+import RegisterPage from "./pages/RegisterPage";
 
 const PrivateRoute = ({ children }) => {
     const role = sessionStorage.getItem("role"); // owner | tenant
@@ -72,6 +73,7 @@ function App() {
                     <Route path="about" element={<AboutPage />} />
                     <Route path="contact" element={<ContactPage />} />
                     <Route path="login" element={<LoginPage />} />
+                    <Route path="register" element={<RegisterPage />} />
 
                     {/* 🔐 ROLE BASED DASHBOARD */}
                     <Route
