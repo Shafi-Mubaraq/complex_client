@@ -11,7 +11,7 @@ import HouseCard from "../components/House/HouseCard";
 
 const HousePage = () => {
 
-    const apiUrl = import.meta.env.VITE_API_URL?.trim() || "http://localhost:5000";
+    const apiUrl = import.meta.env.VITE_API_URL;
     const [houses, setHouses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedHouse, setSelectedHouse] = useState(null);

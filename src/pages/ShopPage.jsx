@@ -433,7 +433,7 @@ import ShopCard from "../components/Shop/ShopCard";
 
 const ShopsPage = () => {
 
-    const apiUrl = import.meta.env.VITE_API_URL?.trim() || "http://localhost:5000";
+    const apiUrl = import.meta.env.VITE_API_URL;
     const [shops, setShops] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedShop, setSelectedShop] = useState(null);
