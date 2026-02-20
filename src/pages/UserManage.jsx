@@ -10,6 +10,7 @@ const INITIAL_USER = {
 };
 
 const UserManage = () => {
+    
     const [users, setUsers] = useState([]);
     const [search, setSearch] = useState("");
     const [editUser, setEditUser] = useState(null);
