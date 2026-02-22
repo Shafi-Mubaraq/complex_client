@@ -5,7 +5,8 @@ import {
     Clock, Loader2, UserCheck, FilterX, Store, ArrowUpRight, Search
 } from "lucide-react";
 
-const BookingRequest = () => {
+const BookingQueue = () => {
+    
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -239,4 +240,4 @@ const EmptyState = () => (
     </div>
 );
 
-export default BookingRequest;
+export default BookingQueue;

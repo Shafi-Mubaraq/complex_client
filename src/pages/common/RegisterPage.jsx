@@ -4,7 +4,7 @@ import {
     FaPhone, FaCity, FaGlobe, FaArrowLeft 
 } from "react-icons/fa";
 import { ChevronRight, ShieldCheck, UserPlus } from "lucide-react";
-import CustomInput from "../components/Common/CustomInput";
+import CustomInput from "../../components/Common/CustomInput";
 
 const INITIAL_STATE = {
     fullName: "",

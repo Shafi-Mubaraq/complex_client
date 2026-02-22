@@ -3,7 +3,7 @@ import { FaLock, FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
 import { ArrowRight, LogIn, ChevronRight, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import CustomInput from "../components/Common/CustomInput";
+import CustomInput from "../../components/Common/CustomInput";
 
 const LoginPage = ({ onClose, onSwitchToSignUp }) => {
 

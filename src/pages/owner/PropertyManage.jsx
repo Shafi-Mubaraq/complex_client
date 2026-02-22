@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Search, UserPlus } from "lucide-react";
-import PropertyTable from "../components/PropertyManagement/PropertyTable";
-import PropertyModal from "../components/PropertyManagement/PropertyModal";
-import DeleteModal from "../components/PropertyManagement/DeleteModal";
+import PropertyTable from "../../components/PropertyManagement/PropertyTable";
+import PropertyModal from "../../components/PropertyManagement/PropertyModal";
+import DeleteModal from "../../components/PropertyManagement/DeleteModal";
 
 const PropertyManage = () => {
 

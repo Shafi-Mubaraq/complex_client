@@ -1,6 +1,6 @@
 import React from "react";
 import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from "react-icons/fa";
-import CustomInput from "../components/Common/CustomInput";
+import CustomInput from "../../components/Common/CustomInput";
 import { Clock, Globe } from "lucide-react";
 
 const ContactPage = () => {

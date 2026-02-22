@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Search, UserPlus } from "lucide-react";
-import UserTable from "../components/UserManagement/UserTable";
-import UserModal from "../components/UserManagement/UserModal";
-import DeleteModal from "../components/UserManagement/DeleteModal";
+import UserTable from "../../components/UserManagement/UserTable";
+import UserModal from "../../components/UserManagement/UserModal";
+import DeleteModal from "../../components/UserManagement/DeleteModal";
 
 const INITIAL_USER = {
     fullName: "", email: "", password: "", aadhar: "",
