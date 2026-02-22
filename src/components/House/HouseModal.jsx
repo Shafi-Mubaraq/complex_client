@@ -17,18 +17,6 @@ const HouseModal = ({ house, onClose }) => {
 
     if (!house) return null;
 
-    const validate = () => {
-        let newErrors = {};
-        if (!form.fullName.trim()) newErrors.fullName = "Full legal name is required";
-        if (!form.familyType) newErrors.familyType = "Please select a category";
-        if (!form.numberOfMembers || form.numberOfMembers <= 0) newErrors.numberOfMembers = "Invalid member count";
-        if (!/^[6-9]\d{9}$/.test(form.phoneNumber)) newErrors.phoneNumber = "Valid 10-digit number required";
-        if (!form.address.trim()) newErrors.address = "Current residence address required";
-        if (!/^\d{12}$/.test(form.aadharNumber)) newErrors.aadharNumber = "12-digit Aadhar number required";
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
         if (errors[e.target.name]) setErrors({ ...errors, [e.target.name]: "" });
@@ -36,21 +24,12 @@ const HouseModal = ({ house, onClose }) => {
 
     const submitRequest = async (e) => {
         e.preventDefault();
-        if (!validate()) return;
-
         try {
             setLoading(true);
-            const userData = JSON.parse(localStorage.getItem("user") || "{}");
-
-            if (!userData._id) {
-                setStatus("error");
-                setErrors({ ...errors, form: "Please login to submit application" });
-                return;
-            }
-
+            const mobile = sessionStorage.getItem("mobile");
             const payload = {
                 property: house._id,
-                applicantUser: userData._id,
+                applicantUser: mobile,
                 propertyType: "house",
                 houseDetails: {
                     familyType: form.familyType,
@@ -58,10 +37,11 @@ const HouseModal = ({ house, onClose }) => {
                 },
                 message: form.message,
             };
-
-            await axios.post(`${apiUrl}/api/propertyRequest/create`, payload);
-            setStatus("success");
-            setTimeout(() => onClose(), 1200);
+            const response = await axios.post(`${apiUrl}/api/propertyRequest/create`, payload);
+            if (response.data.success) {
+                setStatus("success");
+                onClose();
+            }
         } catch (err) {
             console.error("Submission error:", err);
             setStatus("error");
@@ -77,7 +57,6 @@ const HouseModal = ({ house, onClose }) => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={onClose} />
-
             <div className="relative bg-white w-full max-w-5xl max-h-[80vh] rounded-2xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col lg:flex-row animate-in fade-in zoom-in duration-200">
                 {/* LEFT SIDE: Media (Asset View) */}
                 <div className="lg:w-5/12 bg-slate-50 overflow-y-auto border-r border-slate-100 p-8 hide-scrollbar">
@@ -120,7 +99,7 @@ const HouseModal = ({ house, onClose }) => {
                         </button>
                     </div>
 
-                    <form onSubmit={submitRequest} noValidate className="flex-1 overflow-y-auto p-10 hide-scrollbar">
+                    <div className="flex-1 overflow-y-auto p-10 hide-scrollbar">
                         <div className="grid grid-cols-3 gap-4 mb-10">
                             <QuickStat label="Rent / Month" value={`₹${house.rent}`} />
                             <QuickStat label="Deposit" value={`₹${house.deposit}`} />
@@ -132,7 +111,6 @@ const HouseModal = ({ house, onClose }) => {
 
                         <div className="space-y-8">
                             <SectionHeader title="Application Details" />
-
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-3">
                                     <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wide ml-1">
@@ -162,7 +140,7 @@ const HouseModal = ({ house, onClose }) => {
                                 {errors.form || "Please correct the highlighted fields"}
                             </div>
                         )}
-                    </form>
+                    </div>
 
                     {/* Footer */}
                     <div className="px-10 py-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
@@ -176,7 +154,7 @@ const HouseModal = ({ house, onClose }) => {
                                 <span className="text-[9px] font-bold uppercase tracking-widest">Encrypted</span>
                             </div>
                         </div>
-                        <button onClick={submitRequest} disabled={loading} className="w-full sm:w-auto flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-lg shadow-indigo-100 active:scale-95 disabled:bg-slate-300">
+                        <button onClick={submitRequest} className="w-full sm:w-auto flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-3.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-lg shadow-indigo-100 active:scale-95 disabled:bg-slate-300">
                             {loading ? (
                                 "Processing..."
                             ) : (

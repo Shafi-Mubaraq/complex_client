@@ -3,7 +3,6 @@ import axios from "axios";
 import { X, MapPin, Send, AlertCircle, Store, ShieldCheck, Database, Briefcase } from "lucide-react";
 
 const ShopModal = ({ shop, onClose }) => {
-    
     const apiUrl = import.meta.env.VITE_API_URL?.trim() || "http://localhost:5000";
 
     // --- KEEPING YOUR ORIGINAL STATE ---
@@ -27,16 +26,13 @@ const ShopModal = ({ shop, onClose }) => {
     const validate = () => {
         let newErrors = {};
         if (!form.fullName.trim()) newErrors.fullName = "Full name is required";
-
         // Shop Specific Validation
         if (!form.businessName.trim()) newErrors.businessName = "Business name required";
         if (!form.businessType.trim()) newErrors.businessType = "Business type required";
         if (!form.numberOfEmployees || form.numberOfEmployees <= 0) newErrors.numberOfEmployees = "Invalid count";
-
         if (!/^[6-9]\d{9}$/.test(form.phoneNumber)) newErrors.phoneNumber = "Valid 10-digit number required";
         if (!form.address.trim()) newErrors.address = "Address required";
         if (!/^\d{12}$/.test(form.aadharNumber)) newErrors.aadharNumber = "12-digit Aadhar number required";
-
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -47,60 +43,43 @@ const ShopModal = ({ shop, onClose }) => {
     };
 
     const submitRequest = async (e) => {
+
         e.preventDefault();
-        if (!validate()) return;
 
         try {
+
             setLoading(true);
+            const mobile = sessionStorage.getItem("mobile");
 
-            // First, create/update user in database
-            const userPayload = {
-                fullName: form.fullName,
-                mobile: form.phoneNumber,
-                aadhar: form.aadharNumber,
-                email: `${form.phoneNumber}@temp.com`, // Temporary email since not in form
-                password: "temporary-password", // This should be handled better in production
-                role: "tenant",
-            };
-
-            let userId;
-            try {
-                // Try to find existing user by phone or create new one
-                const userResponse = await axios.post(`${apiUrl}/api/users/find-or-create`, userPayload);
-                userId = userResponse.data.user._id;
-            } catch (userError) {
-                console.error("User creation error:", userError);
+            if (!mobile) {
                 setStatus("error");
-                setErrors({ ...errors, form: "Failed to create user account" });
-                setLoading(false);
+                setErrors({ form: "Please login to submit application" });
                 return;
             }
 
-            // --- PAYLOAD FOR SHOPS (keeping your structure but with userId) ---
             const payload = {
                 property: shop._id,
-                applicantUser: userId, // Using the user ID from database
+                applicantUser: mobile, 
                 propertyType: "shop",
-
-                // Shop Details specifically
                 shopDetails: {
                     businessName: form.businessName,
                     businessType: form.businessType,
                     numberOfEmployees: Number(form.numberOfEmployees),
                 },
-
                 message: form.message,
             };
 
             const response = await axios.post(`${apiUrl}/api/propertyRequest/create`, payload);
 
-            setStatus("success");
-            setTimeout(() => onClose(), 1200);
+            if (response.data.success) {
+                setStatus("success");
+                onClose();
+            }
         } catch (err) {
             console.error("Submission error:", err);
             setStatus("error");
             if (err.response?.data?.message) {
-                setErrors({ ...errors, form: err.response.data.message });
+                setErrors({ form: err.response.data.message });
             }
         } finally {
             setLoading(false);
