@@ -289,32 +289,99 @@ const BookingQueue = () => {
     });
   }, [searchContact, requests]);
 
-  const handleAction = async (id, action) => {
-    setProcessingId(id);
+//   const handleAction = async (id, action) => {
+
+//     setProcessingId(id);
+//     try {
+//       await axios.put(`${apiUrl}/api/propertyRequest/${action}/${id}`);
+//       if (action === 'accept') {
+//         setSelectedRequestId(id);
+//         setShowLeaseModal(true);
+//       }
+//       await fetchRequests();
+//     } catch (err) {
+//       alert(err.response?.data?.message || "Operation failed");
+//     } finally {
+//       setProcessingId(null);
+//     }
+//   };
+
+
+const handleAction = async (id, action) => {
+
+  if (action === "accept") {
+    setSelectedRequestId(id);
+    setShowLeaseModal(true);
+    return; // ❗ DO NOT call backend yet
+  }
+
+  if (action === "reject") {
     try {
-      await axios.put(`${apiUrl}/api/propertyRequest/${action}/${id}`);
-      if (action === 'accept') {
-        setSelectedRequestId(id);
-        setShowLeaseModal(true);
-      }
+      setProcessingId(id);
+      await axios.put(`${apiUrl}/api/propertyRequest/reject/${id}`);
       await fetchRequests();
     } catch (err) {
       alert(err.response?.data?.message || "Operation failed");
     } finally {
       setProcessingId(null);
     }
-  };
+  }
+};
+//   const createLease = async () => {
+//     try {
+//       await axios.post(`${apiUrl}/api/propertyRequest/create-lease/${selectedRequestId}`, leaseData);
+//       alert("Lease Created Successfully");
+//       setShowLeaseModal(false);
+//       setLeaseData({ startDate: "", endDate: "", monthlyRent: "", depositAmount: "" });
+//     } catch (err) {
+//       alert(err.response?.data?.message || "Lease creation failed");
+//     }
+//   };
 
-  const createLease = async () => {
-    try {
-      await axios.post(`${apiUrl}/api/propertyRequest/create-lease/${selectedRequestId}`, leaseData);
-      alert("Lease Created Successfully");
-      setShowLeaseModal(false);
-      setLeaseData({ startDate: "", endDate: "", monthlyRent: "", depositAmount: "" });
-    } catch (err) {
-      alert(err.response?.data?.message || "Lease creation failed");
-    }
-  };
+const createLease = async () => {
+
+  if (!leaseData.startDate || !leaseData.monthlyRent) {
+    alert("Start Date and Monthly Rent are required");
+    return;
+  }
+
+  try {
+    setProcessingId(selectedRequestId);
+
+    // 1️⃣ First Accept Request
+    await axios.put(
+      `${apiUrl}/api/propertyRequest/accept/${selectedRequestId}`
+    );
+
+    // 2️⃣ Then Create Lease
+    await axios.post(
+      `${apiUrl}/api/propertyRequest/create-lease/${selectedRequestId}`,
+      {
+        startDate: leaseData.startDate,
+        endDate: leaseData.endDate,
+        monthlyRent: Number(leaseData.monthlyRent),
+        depositAmount: Number(leaseData.depositAmount)
+      }
+    );
+
+    alert("Lease Created Successfully");
+
+    setShowLeaseModal(false);
+    setLeaseData({
+      startDate: "",
+      endDate: "",
+      monthlyRent: "",
+      depositAmount: ""
+    });
+
+    await fetchRequests();
+
+  } catch (err) {
+    alert(err.response?.data?.message || "Lease creation failed");
+  } finally {
+    setProcessingId(null);
+  }
+};
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen bg-slate-50">
@@ -379,12 +446,12 @@ const BookingQueue = () => {
                   </td>
                   <td className="p-4">
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold capitalize border ${
-                      req.status === 'approved' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
+                      req.status === 'accepted' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
                       req.status === 'rejected' ? 'bg-rose-50 text-rose-700 border-rose-100' :
                       'bg-amber-50 text-amber-700 border-amber-100'
                     }`}>
                       {req.status === 'pending' && <Clock size={12} />}
-                      {req.status === 'approved' && <CheckCircle2 size={12} />}
+                      {req.status === 'accepted' && <CheckCircle2 size={12} />}
                       {req.status === 'rejected' && <XCircle size={12} />}
                       {req.status}
                     </span>
