@@ -1,165 +1,281 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { 
-  FiHome, FiUser, FiCalendar, FiSearch, FiFilter, 
-  FiMoreVertical, FiArrowUpRight, FiTrendingUp, FiClock 
+import {
+    FiHome,
+    FiUser,
+    FiCalendar,
+    FiSearch,
+    FiFilter,
+    FiMoreVertical,
+    FiTrendingUp,
+    FiClock,
+    FiCheckCircle,
+    FiXCircle,
+    FiDollarSign,
 } from "react-icons/fi";
 
 const LeaseDetails = () => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
-  const [leases, setLeases] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
 
-  const fetchLeases = async () => {
-    try {
-      const res = await axios.get(`${apiUrl}/api/propertyRequest/leases`);
-      setLeases(res.data.data || []);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    const [leases, setLeases] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
 
-  useEffect(() => { fetchLeases(); }, []);
-
-  // UI Helper: Status Badge Logic
-  const StatusBadge = ({ status }) => {
-    const styles = {
-      active: "bg-emerald-50 text-emerald-600 ring-emerald-600/20",
-      pending: "bg-amber-50 text-amber-600 ring-amber-600/20",
-      expired: "bg-rose-50 text-rose-600 ring-rose-600/20",
+    const fetchLeases = async () => {
+        try {
+            const res = await axios.get(`${apiUrl}/api/propertyRequest/leases`);
+            setLeases(res.data.data || []);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     };
-    const style = styles[status?.toLowerCase()] || "bg-slate-50 text-slate-600 ring-slate-600/20";
-    return (
-      <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${style}`}>
-        {status}
-      </span>
+
+    useEffect(() => {
+        fetchLeases();
+    }, []);
+
+    const totalLeases = leases.length;
+    const activeLeases = leases.filter((l) => l.status?.toLowerCase() === "active").length;
+    const pendingLeases = leases.filter((l) => l.status?.toLowerCase() === "pending").length;
+    const expiredLeases = leases.filter((l) => l.status?.toLowerCase() === "expired").length;
+    const totalMonthlyRent = leases.reduce(
+        (sum, lease) => sum + (lease.monthlyRent || 0),
+        0
     );
-  };
 
-  if (loading) return (
-    <div className="flex items-center justify-center min-h-screen bg-slate-50">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
-    </div>
-  );
+    const StatusBadge = ({ status }) => {
+        const statusConfig = {
+            active: {
+                bg: "bg-emerald-50",
+                text: "text-emerald-700",
+                ring: "ring-emerald-600/20",
+                icon: FiCheckCircle,
+            },
+            pending: {
+                bg: "bg-amber-50",
+                text: "text-amber-700",
+                ring: "ring-amber-600/20",
+                icon: FiClock,
+            },
+            expired: {
+                bg: "bg-rose-50",
+                text: "text-rose-700",
+                ring: "ring-rose-600/20",
+                icon: FiXCircle,
+            },
+        };
+        const config = statusConfig[status?.toLowerCase()] || {
+            bg: "bg-slate-50",
+            text: "text-slate-700",
+            ring: "ring-slate-600/20",
+            icon: FiHome,
+        };
+        const Icon = config.icon;
 
-  return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 p-4 lg:p-10 font-sans">
-      <div className="max-w-7xl mx-auto">
-        
-        {/* TOP NAV / TITLE */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
-          <div>
-            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Lease Overview</h1>
-            <p className="text-slate-500 font-medium">Monitoring {leases.length} active rental contracts.</p>
-          </div>
-          <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-semibold transition-all shadow-lg shadow-indigo-200 flex items-center gap-2 w-fit">
-            <FiHome size={18}/> Add New Lease
-          </button>
-        </header>
+        return (
+            <span
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset ${config.bg} ${config.text} ${config.ring}`}
+            >
+                <Icon size={12} />
+                {status}
+            </span>
+        );
+    };
 
-        {/* STATS CARDS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          {[
-            { label: 'Total Revenue', value: '₹4.2L', icon: <FiTrendingUp />, color: 'text-indigo-600', bg: 'bg-indigo-50' },
-            { label: 'Active Leases', value: leases.length, icon: <FiHome />, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-            { label: 'Expiring Soon', value: '3', icon: <FiClock />, color: 'text-amber-600', bg: 'bg-amber-50' },
-          ].map((stat, i) => (
-            <div key={i} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-indigo-200 transition-all cursor-default">
-              <div>
-                <p className="text-slate-400 text-sm font-semibold uppercase tracking-wider">{stat.label}</p>
-                <h3 className="text-2xl font-bold mt-1">{stat.value}</h3>
-              </div>
-              <div className={`${stat.bg} ${stat.color} p-4 rounded-xl text-xl group-hover:scale-110 transition-transform`}>
-                {stat.icon}
-              </div>
+    const filteredLeases = leases.filter((lease) => {
+        const searchLower = searchTerm.toLowerCase();
+        return (
+            lease.property?.title?.toLowerCase().includes(searchLower) ||
+            lease.tenant?.fullName?.toLowerCase().includes(searchLower) ||
+            lease.owner?.fullName?.toLowerCase().includes(searchLower)
+        );
+    });
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-slate-50 p-6 md:p-8">
+                <div className="max-w-7xl mx-auto">
+                    <div className="animate-pulse">
+                        {/* Header skeleton */}
+                        <div className="h-8 bg-slate-200 rounded w-1/3 mb-4"></div>
+                        <div className="h-4 bg-slate-200 rounded w-1/4 mb-8"></div>
+                        {/* Stats skeleton */}
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                            {[...Array(4)].map((_, i) => (
+                                <div key={i} className="h-24 bg-slate-200 rounded-2xl"></div>
+                            ))}
+                        </div>
+                        {/* Table skeleton */}
+                        <div className="bg-white rounded-3xl border border-slate-100 p-6 space-y-4">
+                            <div className="h-10 bg-slate-200 rounded-xl w-1/2"></div>
+                            <div className="space-y-3">
+                                {[...Array(5)].map((_, i) => (
+                                    <div key={i} className="h-12 bg-slate-200 rounded-xl"></div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          ))}
-        </div>
+        );
+    }
 
-        {/* TABLE CONTROLS */}
-        <div className="bg-white rounded-t-3xl border-x border-t border-slate-100 p-6 flex flex-col md:flex-row gap-4 justify-between items-center">
-          <div className="relative w-full md:w-96">
-            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Search property, tenant or owner..."
-              className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 transition-all text-sm"
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <button className="flex items-center gap-2 text-slate-600 font-semibold px-4 py-2 border border-slate-200 rounded-xl hover:bg-slate-50 transition-all">
-            <FiFilter /> Filters
-          </button>
-        </div>
+    return (
+        <div className="min-h-screenfont-sans">
+            <div className="max-w-7xl mx-auto">
+                {/* Header with title and CTA */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                    <div>
+                        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
+                            Lease Overview
+                        </h1>
+                        <p className="text-slate-500 mt-1">
+                            Manage and monitor all rental contracts
+                        </p>
+                    </div>
+                    <button className="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-3 rounded-xl font-semibold transition-all shadow-lg shadow-indigo-200/50">
+                        <FiHome size={18} />
+                        Add New Lease
+                    </button>
+                </div>
 
-        {/* DATA TABLE */}
-        <div className="bg-white rounded-b-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50/50">
-                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase">Property</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase">Tenant</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase">Timeline</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase">Monthly Rent</th>
-                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase">Status</th>
-                  <th className="px-6 py-4"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {leases.map((lease) => (
-                  <tr key={lease._id} className="group hover:bg-slate-50/80 transition-all">
-                    <td className="px-6 py-5">
-                      <div className="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">
-                        {lease.property?.title}
-                      </div>
-                      <div className="text-xs text-slate-400 mt-0.5">{lease.property?.location}</div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-600">
-                          {lease.tenant?.fullName?.charAt(0)}
-                        </div>
-                        <div>
-                          <div className="text-sm font-semibold text-slate-700">{lease.tenant?.fullName}</div>
-                          <div className="text-[11px] text-slate-400 leading-none">Owner: {lease.owner?.fullName}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="flex items-center gap-2 text-sm text-slate-600">
-                        <FiCalendar className="text-indigo-400" />
-                        <span>{new Date(lease.startDate).toLocaleDateString()}</span>
-                        <span className="text-slate-300">→</span>
-                        <span>{lease.endDate ? new Date(lease.endDate).toLocaleDateString() : '—'}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <div className="text-sm font-black text-slate-800">
-                        ₹{lease.monthlyRent?.toLocaleString()}
-                        <span className="text-[10px] text-slate-400 font-medium ml-1">/mo</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5">
-                      <StatusBadge status={lease.status} />
-                    </td>
-                    <td className="px-6 py-5 text-right">
-                      <button className="text-slate-300 hover:text-slate-600 transition-colors">
-                        <FiMoreVertical size={20} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                {/* Search and Filter */}
+                <div className="bg-white rounded-t-2xl border-x border-t border-slate-100 p-5 flex flex-col md:flex-row gap-4 justify-between items-center">
+                    <div className="relative w-full md:w-96">
+                        <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                        <input
+                            type="text"
+                            placeholder="Search property, tenant or owner..."
+                            className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <button className="flex items-center gap-2 text-slate-600 font-medium px-5 py-3 border border-slate-200 rounded-xl hover:bg-slate-50 transition-all">
+                        <FiFilter size={18} />
+                        Filters
+                    </button>
+                </div>
+
+                {/* Leases Table */}
+                <div className="bg-white rounded-b-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="bg-slate-50 border-y border-slate-100">
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                        <div className="flex items-center gap-2">
+                                            <FiHome size={14} className="text-slate-400" />
+                                            Property
+                                        </div>
+                                    </th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                        <div className="flex items-center gap-2">
+                                            <FiUser size={14} className="text-slate-400" />
+                                            Tenant / Owner
+                                        </div>
+                                    </th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                        <div className="flex items-center gap-2">
+                                            <FiCalendar size={14} className="text-slate-400" />
+                                            Timeline
+                                        </div>
+                                    </th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                        <div className="flex items-center gap-2">
+                                            <FiDollarSign size={14} className="text-slate-400" />
+                                            Monthly Rent
+                                        </div>
+                                    </th>
+                                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                                        Status
+                                    </th>
+                                    <th className="px-6 py-4 text-right"></th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {filteredLeases.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="6" className="px-6 py-12 text-center text-slate-500">
+                                            No leases found matching your search.
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    filteredLeases.map((lease) => (
+                                        <tr key={lease._id} className="group hover:bg-slate-50 transition-colors">
+                                            <td className="px-6 py-4">
+                                                <div className="font-medium text-slate-800 group-hover:text-indigo-600 transition-colors">
+                                                    {lease.property?.title || "—"}
+                                                </div>
+                                                <div className="text-xs text-slate-400 mt-0.5">
+                                                    {lease.property?.location || "—"}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="h-8 w-8 rounded-full bg-indigo-50 flex items-center justify-center text-xs font-bold text-indigo-700 uppercase">
+                                                        {lease.tenant?.fullName?.charAt(0) || "?"}
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-sm font-medium text-slate-700">
+                                                            {lease.tenant?.fullName || "—"}
+                                                        </div>
+                                                        <div className="text-xs text-slate-400">
+                                                            Owner: {lease.owner?.fullName || "—"}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-2 text-sm text-slate-600">
+                                                    <FiCalendar className="text-indigo-400" size={14} />
+                                                    <span>
+                                                        {lease.startDate
+                                                            ? new Date(lease.startDate).toLocaleDateString("en-US", {
+                                                                month: "short",
+                                                                day: "numeric",
+                                                                year: "numeric",
+                                                            })
+                                                            : "—"}
+                                                    </span>
+                                                    <span className="text-slate-300">→</span>
+                                                    <span>
+                                                        {lease.endDate
+                                                            ? new Date(lease.endDate).toLocaleDateString("en-US", {
+                                                                month: "short",
+                                                                day: "numeric",
+                                                                year: "numeric",
+                                                            })
+                                                            : "—"}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="text-sm font-semibold text-slate-800">
+                                                    ₹{lease.monthlyRent?.toLocaleString() || 0}
+                                                    <span className="text-xs text-slate-400 font-normal ml-1">/mo</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <StatusBadge status={lease.status} />
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <button className="text-slate-300 hover:text-slate-600 transition-colors">
+                                                    <FiMoreVertical size={18} />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default LeaseDetails;

@@ -98,7 +98,7 @@ const PropertyManage = () => {
     );
 
     return (
-        <div className="space-y-6 bg-white min-h-screen p-6">
+        <div className="space-y-6 bg-white min-h-screen">
 
             {/* Header */}
             <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">

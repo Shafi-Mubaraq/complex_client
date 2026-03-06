@@ -10,7 +10,7 @@ const INITIAL_USER = {
 };
 
 const UserManage = () => {
-    
+
     const [users, setUsers] = useState([]);
     const [search, setSearch] = useState("");
     const [editUser, setEditUser] = useState(null);
@@ -73,6 +73,7 @@ const UserManage = () => {
     };
 
     const handleFormChange = (e) => {
+
         const { name, value } = e.target;
         let processedValue = value;
 
@@ -148,7 +149,7 @@ const UserManage = () => {
         <div className="space-y-6 bg-white min-h-screen">
 
             {/* Action Bar */}
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+            <div className="flex flex-col md:flex-row gap-4 items-center justify-between rounded-2xl border border-slate-100">
                 <div className="relative w-full md:w-80 group">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
                     <input

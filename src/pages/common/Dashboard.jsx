@@ -7,6 +7,7 @@ import UserManage from "../owner/UserManage";
 import PropertyManage from "../owner/PropertyManage";
 import BookingQueue from "../owner/BookingQueue";
 import LeaseDetails from "../owner/LeaseDetails";
+import Dashboard from "../owner/Dashboard";
 
 // Tenant Pages
 import MyLease from "../tenant/MyLease";
@@ -40,6 +41,7 @@ const DashboardPage = () => {
         { id: "profile", label: "My Profile", icon: User, roles: ["tenant"] },
 
         // Owner Menu
+        { id: "dashboard", label: "Admin Dashboard", icon: Layout, roles: ["owner"] },
         { id: "users", label: "User Directory", icon: Users, roles: ["owner"] },
         { id: "property", label: "Property Control", icon: Home, roles: ["owner"] },
         { id: "bookingQueue", label: "Booking Queue", icon: ClipboardList, roles: ["owner"] },
@@ -116,6 +118,7 @@ const DashboardPage = () => {
                     <div className="p-8 flex-1">
                         {role === "owner" && (
                             <>
+                                {dashboardTab === "dashboard" && <Dashboard />}
                                 {dashboardTab === "users" && <UserManage />}
                                 {dashboardTab === "property" && <PropertyManage />}
                                 {dashboardTab === "bookingQueue" && <BookingQueue />}
