@@ -1,22 +1,35 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { User, Mail, Phone, MapPin, IdCard, Edit3, Save, X, ShieldCheck } from "lucide-react";
+import { User, Mail, Phone, CreditCard, MapPin, Edit3, Save, X, Loader2, CheckCircle } from "lucide-react";
 
 const MyProfile = () => {
   const apiUrl = import.meta.env.VITE_API_URL;
-  const mobile = sessionStorage.getItem("mobile");
+  const initialMobile = sessionStorage.getItem("mobile");
 
-  const [profile, setProfile] = useState({});
+  const [profile, setProfile] = useState({
+    fullName: "",
+    email: "",
+    mobile: "",
+    aadhar: "",
+    additionalNumber: "",
+    city: "",
+    state: ""
+  });
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [errors, setErrors] = useState({});
+  const [isSaving, setIsSaving] = useState(false);
 
   const fetchProfile = async () => {
     try {
-      const res = await axios.get(`${apiUrl}/api/userManage/profile/${mobile}`);
-      setProfile(res.data.data);
-      setLoading(false);
+      setLoading(true);
+      const res = await axios.get(`${apiUrl}/api/userManage/profile/${initialMobile}`);
+      if (res.data?.data) {
+        setProfile(res.data.data);
+      }
     } catch (err) {
-      console.error("Profile fetch error:", err);
+      console.error("Error fetching profile", err);
+    } finally {
       setLoading(false);
     }
   };
@@ -25,142 +38,148 @@ const MyProfile = () => {
     fetchProfile();
   }, []);
 
+  const validate = () => {
+    let tempErrors = {};
+    if (!profile.fullName?.trim()) tempErrors.fullName = "Full name is required";
+    if (!/^\S+@\S+\.\S+$/.test(profile.email)) tempErrors.email = "Enter a valid email address";
+    if (!/^\d{10}$/.test(profile.mobile)) tempErrors.mobile = "Mobile must be exactly 10 digits";
+    if (profile.aadhar && !/^\d{12}$/.test(profile.aadhar)) tempErrors.aadhar = "Aadhar must be exactly 12 digits";
+    if (!profile.city?.trim()) tempErrors.city = "City is required";
+    
+    setErrors(tempErrors);
+    return Object.keys(tempErrors).length === 0;
+  };
+
   const handleChange = (e) => {
-    setProfile({ ...profile, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    // Strict Digit Constraints: Prevents typing more than allowed
+    if (name === "mobile" || name === "additionalNumber") {
+      if (!/^\d*$/.test(value) || value.length > 10) return;
+    }
+    if (name === "aadhar") {
+      if (!/^\d*$/.test(value) || value.length > 12) return;
+    }
+
+    setProfile(prev => ({ ...prev, [name]: value }));
+    
+    // Clear error immediately when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: "" }));
+    }
   };
 
   const updateProfile = async () => {
+    if (!validate()) return;
+
     try {
+      setIsSaving(true);
       await axios.put(`${apiUrl}/api/userManage/edit/${profile._id}`, profile);
-      alert("Profile updated successfully");
+      sessionStorage.setItem("mobile", profile.mobile);
       setEditMode(false);
+      // Optional: Success toast or notification
     } catch (err) {
-      console.error("Update error:", err);
+      alert("Update failed. Please check your connection.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+      <div className="flex flex-col justify-center items-center h-96 space-y-4">
+        <Loader2 className="animate-spin text-indigo-600" size={48} />
+        <p className="text-gray-500 font-medium animate-pulse">Loading your profile...</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-8">
-      {/* Profile Header */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 h-32 md:h-40"></div>
-        <div className="px-6 pb-6">
-          <div className="relative flex justify-between items-end -mt-12 mb-6">
-            <div className="p-1 bg-white rounded-2xl shadow-lg">
-              <div className="bg-gray-100 h-24 w-24 md:h-32 md:w-32 rounded-xl flex items-center justify-center text-blue-600">
-                <User size={48} />
+    <div className="max-w-4xl mx-auto my-12 px-4">
+      <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+        {/* Decorative Header Banner */}
+        <div className="h-32 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 p-8">
+          <div className="flex justify-between items-start">
+            <h2 className="text-white text-3xl font-bold flex items-center gap-3">
+              <User className="bg-white/20 p-1.5 rounded-lg" size={32} />
+              My Profile
+            </h2>
+            <button
+              onClick={() => {
+                if (editMode) fetchProfile();
+                setEditMode(!editMode);
+              }}
+              className={`flex items-center gap-2 px-5 py-2 rounded-full font-medium transition-all duration-300 shadow-lg ${
+                editMode 
+                  ? "bg-white/20 text-white hover:bg-white/30 backdrop-blur-md" 
+                  : "bg-white text-indigo-600 hover:scale-105 active:scale-95"
+              }`}
+            >
+              {editMode ? <><X size={18} /> Cancel</> : <><Edit3 size={18} /> Edit Details</>}
+            </button>
+          </div>
+        </div>
+
+        <div className="px-8 pb-8 -mt-8">
+          <div className="bg-white rounded-2xl shadow-lg p-6 md:p-10 border border-gray-50">
+            {/* Form Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+              <InputField 
+                label="Full Name" icon={<User size={18}/>} name="fullName" 
+                value={profile.fullName} onChange={handleChange} 
+                disabled={!editMode} error={errors.fullName} placeholder="John Doe"
+              />
+              <InputField 
+                label="Email Address" icon={<Mail size={18}/>} name="email" 
+                value={profile.email} onChange={handleChange} 
+                disabled={!editMode} error={errors.email} placeholder="john@example.com"
+              />
+              <InputField 
+                label="Mobile Number (10 Digits)" icon={<Phone size={18}/>} name="mobile" 
+                value={profile.mobile} onChange={handleChange} 
+                disabled={!editMode} error={errors.mobile} placeholder="9876543210"
+              />
+              <InputField 
+                label="Aadhar Card (12 Digits)" icon={<CreditCard size={18}/>} name="aadhar" 
+                value={profile.aadhar} onChange={handleChange} 
+                disabled={!editMode} error={errors.aadhar} placeholder="1234 5678 9012"
+              />
+              <InputField 
+                label="Secondary Contact" icon={<Phone size={18}/>} name="additionalNumber" 
+                value={profile.additionalNumber} onChange={handleChange} 
+                disabled={!editMode} placeholder="Optional contact"
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <InputField 
+                  label="City" icon={<MapPin size={18}/>} name="city" 
+                  value={profile.city} onChange={handleChange} 
+                  disabled={!editMode} error={errors.city} placeholder="City"
+                />
+                <InputField 
+                  label="State" icon={<MapPin size={18}/>} name="state" 
+                  value={profile.state} onChange={handleChange} 
+                  disabled={!editMode} placeholder="State"
+                />
               </div>
             </div>
-            {!editMode ? (
-              <button
-                onClick={() => setEditMode(true)}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-all shadow-md"
-              >
-                <Edit3 size={18} /> Edit Profile
-              </button>
-            ) : (
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setEditMode(false)}
-                  className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-5 py-2.5 rounded-lg font-medium transition-all"
-                >
-                  <X size={18} /> Cancel
-                </button>
+
+            {/* Save Button */}
+            {editMode && (
+              <div className="mt-12 flex justify-center">
                 <button
                   onClick={updateProfile}
-                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg font-medium transition-all shadow-md"
+                  disabled={isSaving}
+                  className="group relative flex items-center gap-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white px-10 py-4 rounded-2xl font-bold shadow-xl shadow-indigo-200 transition-all transform hover:-translate-y-1 active:translate-y-0"
                 >
-                  <Save size={18} /> Save Changes
+                  {isSaving ? (
+                    <Loader2 className="animate-spin" size={20} />
+                  ) : (
+                    <CheckCircle size={20} className="group-hover:scale-110 transition-transform" />
+                  )}
+                  {isSaving ? "Saving..." : "Save Profile Changes"}
                 </button>
               </div>
             )}
-          </div>
-
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{profile.fullName || "User Name"}</h1>
-            <p className="text-gray-500 flex items-center gap-1 mt-1">
-              <ShieldCheck size={16} className="text-green-500" /> Verified Account
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Profile Form */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
-        <h3 className="text-lg font-semibold text-gray-800 mb-6 border-b pb-4">Personal Information</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Input Group */}
-          <InputField 
-            label="Full Name" 
-            name="fullName" 
-            icon={<User size={18}/>} 
-            value={profile.fullName} 
-            onChange={handleChange} 
-            disabled={!editMode} 
-          />
-
-          <InputField 
-            label="Email Address" 
-            name="email" 
-            icon={<Mail size={18}/>} 
-            value={profile.email} 
-            onChange={handleChange} 
-            disabled={!editMode} 
-          />
-
-          <InputField 
-            label="Mobile Number" 
-            name="mobile" 
-            icon={<Phone size={18}/>} 
-            value={profile.mobile} 
-            disabled={true} 
-            tooltip="Mobile number cannot be changed"
-          />
-
-          <InputField 
-            label="Aadhar Number" 
-            name="aadhar" 
-            icon={<IdCard size={18}/>} 
-            value={profile.aadhar} 
-            onChange={handleChange} 
-            disabled={!editMode} 
-          />
-
-          <InputField 
-            label="Additional Number" 
-            name="additionalNumber" 
-            icon={<Phone size={18}/>} 
-            value={profile.additionalNumber} 
-            onChange={handleChange} 
-            disabled={!editMode} 
-          />
-
-          <div className="grid grid-cols-2 gap-4">
-            <InputField 
-              label="City" 
-              name="city" 
-              icon={<MapPin size={18}/>} 
-              value={profile.city} 
-              onChange={handleChange} 
-              disabled={!editMode} 
-            />
-            <InputField 
-              label="State" 
-              name="state" 
-              icon={<MapPin size={18}/>} 
-              value={profile.state} 
-              onChange={handleChange} 
-              disabled={!editMode} 
-            />
           </div>
         </div>
       </div>
@@ -168,28 +187,33 @@ const MyProfile = () => {
   );
 };
 
-// Reusable Input Component for clean code
-const InputField = ({ label, name, icon, value, onChange, disabled, tooltip }) => (
-  <div className="space-y-1.5">
-    <label className="text-sm font-medium text-gray-700 flex justify-between">
+// Enhanced Reusable Input Component
+const InputField = ({ label, icon, name, value, onChange, disabled, error, placeholder }) => (
+  <div className="flex flex-col gap-1.5 group">
+    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">
       {label}
-      {tooltip && disabled && <span className="text-[10px] text-gray-400 uppercase tracking-tighter">{tooltip}</span>}
     </label>
-    <div className="relative group">
-      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors">
+    <div className={`flex items-center border-2 rounded-xl px-4 py-3 transition-all duration-200 ${
+      disabled 
+        ? "bg-gray-50 border-gray-100" 
+        : "bg-white border-gray-200 group-focus-within:border-indigo-500 group-focus-within:ring-4 group-focus-within:ring-indigo-50"
+    } ${error ? "border-red-400 ring-4 ring-red-50" : ""}`}>
+      <span className={`${disabled ? "text-gray-300" : "text-indigo-400"} mr-3`}>
         {icon}
-      </div>
+      </span>
       <input
         name={name}
         value={value || ""}
         onChange={onChange}
         disabled={disabled}
-        className={`w-full pl-10 pr-4 py-2.5 rounded-xl border transition-all outline-none
-          ${disabled 
-            ? "bg-gray-50 text-gray-500 border-gray-200 cursor-not-allowed" 
-            : "bg-white border-gray-300 focus:border-blue-600 focus:ring-4 focus:ring-blue-50/50"
-          }`}
+        placeholder={placeholder}
+        className="w-full outline-none bg-transparent text-gray-700 font-medium placeholder:text-gray-300 disabled:text-gray-400"
       />
+    </div>
+    <div className="h-4">
+        {error && <span className="text-xs text-red-500 font-medium ml-1 flex items-center gap-1">
+            <X size={12} /> {error}
+        </span>}
     </div>
   </div>
 );
