@@ -12,6 +12,7 @@ import Dashboard from "../owner/Dashboard";
 // Tenant Pages
 import MyLease from "../tenant/MyLease";
 import BookingRequest from "../tenant/BookingRequest";
+import MyProfile from "../tenant/MyProfile";
 
 const DashboardPage = () => {
     const [fullName, setFullName] = useState("");
@@ -38,7 +39,7 @@ const DashboardPage = () => {
         { id: "bookingRequests", label: "Booking Requests", icon: FileText, roles: ["tenant"] },
         { id: "payments", label: "Payment History", icon: CreditCard, roles: ["tenant"] },
         { id: "complaints", label: "Support & Complaints", icon: AlertCircle, roles: ["tenant"] },
-        { id: "profile", label: "My Profile", icon: User, roles: ["tenant"] },
+        { id: "MyProfile", label: "My Profile", icon: User, roles: ["tenant"] },
 
         // Owner Menu
         { id: "dashboard", label: "Admin Dashboard", icon: Layout, roles: ["owner"] },
@@ -129,6 +130,7 @@ const DashboardPage = () => {
                             <>
                                 {dashboardTab === "myLease" && <MyLease />}
                                 {dashboardTab === "bookingRequests" && <BookingRequest />}
+                                {dashboardTab === "MyProfile" && <MyProfile />}
                             </>
                         )}
                     </div>
