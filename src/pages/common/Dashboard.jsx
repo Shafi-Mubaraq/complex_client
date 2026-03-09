@@ -8,11 +8,12 @@ import PropertyManage from "../owner/PropertyManage";
 import BookingQueue from "../owner/BookingQueue";
 import LeaseDetails from "../owner/LeaseDetails";
 import Dashboard from "../owner/Dashboard";
-
+import AdminComplaints from "../owner/AdminComplaints";
 // Tenant Pages
 import MyLease from "../tenant/MyLease";
 import BookingRequest from "../tenant/BookingRequest";
 import MyProfile from "../tenant/MyProfile";
+import MyComplaints from "../tenant/MyComplaints";
 
 const DashboardPage = () => {
     const [fullName, setFullName] = useState("");
@@ -40,6 +41,7 @@ const DashboardPage = () => {
         { id: "payments", label: "Payment History", icon: CreditCard, roles: ["tenant"] },
         { id: "complaints", label: "Support & Complaints", icon: AlertCircle, roles: ["tenant"] },
         { id: "MyProfile", label: "My Profile", icon: User, roles: ["tenant"] },
+        { id: "MyComplaints", label: "My Complaints", icon: Bell, roles: ["tenant"] },
 
         // Owner Menu
         { id: "dashboard", label: "Admin Dashboard", icon: Layout, roles: ["owner"] },
@@ -47,6 +49,7 @@ const DashboardPage = () => {
         { id: "property", label: "Property Control", icon: Home, roles: ["owner"] },
         { id: "bookingQueue", label: "Booking Queue", icon: ClipboardList, roles: ["owner"] },
         { id: "leaseDetails", label: "Lease Details", icon: FileText, roles: ["owner"] },
+        { id: "adminComplaints", label: "Complaint Management", icon: AlertCircle, roles: ["owner"] },
     ];
 
     return (
@@ -124,6 +127,7 @@ const DashboardPage = () => {
                                 {dashboardTab === "property" && <PropertyManage />}
                                 {dashboardTab === "bookingQueue" && <BookingQueue />}
                                 {dashboardTab === "leaseDetails" && <LeaseDetails />}
+                                {dashboardTab === "adminComplaints" && <AdminComplaints />}
                             </>
                         )}
                         {role === "tenant" && (
@@ -131,6 +135,9 @@ const DashboardPage = () => {
                                 {dashboardTab === "myLease" && <MyLease />}
                                 {dashboardTab === "bookingRequests" && <BookingRequest />}
                                 {dashboardTab === "MyProfile" && <MyProfile />}
+                                {/* {dashboardTab === "payments" && <PaymentHistory />} */}
+                                {dashboardTab === "MyComplaints" && <MyComplaints />}
+
                             </>
                         )}
                     </div>
