@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import { 
-    FaUser, FaEnvelope, FaKey, FaIdCard, FaMobileAlt, 
-    FaPhone, FaCity, FaGlobe, FaArrowLeft 
+import {
+    FaUser, FaEnvelope, FaKey, FaIdCard, FaMobileAlt,
+    FaPhone, FaCity, FaGlobe, FaArrowLeft
 } from "react-icons/fa";
 import { ChevronRight, ShieldCheck, UserPlus } from "lucide-react";
 import CustomInput from "../../components/Common/CustomInput";
@@ -34,7 +34,7 @@ const RegisterPage = ({ onClose, onSwitchToSignIn }) => {
         // 1. Numeric-only restriction for phone and ID fields
         if (["mobile", "aadhar", "additionalNumber"].includes(name)) {
             const numericValue = value.replace(/\D/g, ""); // Remove non-digits
-            
+
             // 2. Prevent typing beyond character limits
             if ((name === "mobile" || name === "additionalNumber") && numericValue.length > 10) return;
             if (name === "aadhar" && numericValue.length > 12) return;
@@ -43,75 +43,87 @@ const RegisterPage = ({ onClose, onSwitchToSignIn }) => {
         } else {
             setForm({ ...form, [name]: value });
         }
-        
+
         // Clear error when user starts typing
         setError(null);
     };
 
     const validateForm = () => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        
+
         if (form.fullName.trim().length < 3) return "Full Name must be at least 3 characters.";
         if (!emailRegex.test(form.email)) return "Please enter a valid email address.";
         if (form.password.length < 6) return "Password must be at least 6 characters.";
         if (form.aadhar.length !== 12) return "Aadhar Number must be exactly 12 digits.";
-        
+
         // Primary Mobile: Mandatory 10 digits
         if (form.mobile.length !== 10) return "Primary Mobile must be exactly 10 digits.";
-        
+
         // Optional Phone: Only validate if the user has typed something
         if (form.additionalNumber.length > 0 && form.additionalNumber.length !== 10) {
             return "Secondary Phone must be 10 digits if provided.";
         }
-        
+
         if (form.city.trim() === "") return "City is required.";
         if (form.state.trim() === "") return "State is required.";
-        
+
         return null;
     };
 
     const registerSave = async (e) => {
-        e.preventDefault();
-        
-        // Run internal validation
-        const validationError = validateForm();
-        if (validationError) {
-            setError(validationError);
+    e.preventDefault();
+
+    const validationError = validateForm();
+    if (validationError) {
+        setError(validationError);
+        return;
+    }
+
+    setLoading(true);
+
+    try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/signup`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(form)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            setError(data.message || "Signup failed");
             return;
         }
 
-        setLoading(true);
-        try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/signup`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(form),
-            });
+        // SUCCESS
+        alert("Account Created Successfully!");
 
-            const data = await res.json();
+        // 1️⃣ Clear form fields
+        setForm(INITIAL_STATE);
 
-            if (res.status === 409) {
-                setError("Mobile number already registered.");
-                return;
-            }
-
-            if (res.ok) {
-                alert("Account Created Successfully!");
-                onSwitchToSignIn();
-            } else {
-                setError(data.message || "Signup failed.");
-            }
-        } catch (err) {
-            setError("Network error. Please try again.");
-        } finally {
-            setLoading(false);
+        // 2️⃣ Close modal/page
+        if (onClose) {
+            onClose();
         }
-    };
 
+        // 3️⃣ Switch to Sign In
+        if (onSwitchToSignIn) {
+            onSwitchToSignIn();
+        }
+
+    } catch (error) {
+        console.error("Fetch error:", error);
+        setError(ull);
+    } finally {
+        setLoading(false);
+    }
+};
     return (
         <div className="flex justify-center items-center py-10 px-4 min-h-screen bg-slate-50/50">
             <div className="relative max-w-[750px] w-full bg-white rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08)] border border-slate-100 overflow-hidden">
-                
+
                 {/* Visual Accent */}
                 <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 via-purple-700 to-indigo-600"></div>
 
@@ -131,7 +143,7 @@ const RegisterPage = ({ onClose, onSwitchToSignIn }) => {
 
                     <form className="space-y-6" onSubmit={registerSave} noValidate>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
-                            
+
                             {/* Identity Section */}
                             <div className="space-y-4">
                                 <div className="space-y-1.5">
@@ -203,9 +215,9 @@ const RegisterPage = ({ onClose, onSwitchToSignIn }) => {
 
                     {/* Footer */}
                     <div className="mt-8 pt-6 border-t border-slate-100 text-center">
-                        <button 
-                            type="button" 
-                            className="group flex items-center justify-center gap-2 mx-auto text-[11px] font-black text-indigo-600 hover:text-slate-900 transition-all uppercase tracking-widest" 
+                        <button
+                            type="button"
+                            className="group flex items-center justify-center gap-2 mx-auto text-[11px] font-black text-indigo-600 hover:text-slate-900 transition-all uppercase tracking-widest"
                             onClick={onSwitchToSignIn}
                         >
                             <FaArrowLeft className="w-2.5 h-2.5 group-hover:-translate-x-1 transition-transform" />
