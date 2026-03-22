@@ -9,17 +9,26 @@ import BookingQueue from "../owner/BookingQueue";
 import LeaseDetails from "../owner/LeaseDetails";
 import Dashboard from "../owner/Dashboard";
 import AdminComplaints from "../owner/AdminComplaints";
+import AdminFeedback from "../owner/AdminFeedback";
 // Tenant Pages
 import MyLease from "../tenant/MyLease";
 import BookingRequest from "../tenant/BookingRequest";
 import MyProfile from "../tenant/MyProfile";
 import MyComplaints from "../tenant/MyComplaints";
+import MyFeedback from "../tenant/MyFeedback";
 
 const DashboardPage = () => {
+
+    const initialRole = sessionStorage.getItem("role");
     const [fullName, setFullName] = useState("");
     const [mobile, setMobile] = useState("");
     const [role, setRole] = useState("");
-    const [dashboardTab, setDashboardTab] = useState("bookings");
+    // const [dashboardTab, setDashboardTab] = useState("bookings");
+     const [dashboardTab, setDashboardTab] = useState(
+        initialRole === "owner" ? "dashboard" :
+        initialRole === "tenant" ? "myLease" : ""
+    );
+
 
     const navigate = useNavigate();
 
@@ -28,20 +37,38 @@ const DashboardPage = () => {
         navigate("/login", { replace: true });
     };
 
+    // useEffect(() => {
+    //     setFullName(sessionStorage.getItem("fullName"));
+    //     setMobile(sessionStorage.getItem("mobile"));
+    //     setRole(sessionStorage.getItem("role"));
+    // }, []);
     useEffect(() => {
-        setFullName(sessionStorage.getItem("fullName"));
-        setMobile(sessionStorage.getItem("mobile"));
-        setRole(sessionStorage.getItem("role"));
+        const storedFullName = sessionStorage.getItem("fullName");
+        const storedMobile = sessionStorage.getItem("mobile");
+        const storedRole = sessionStorage.getItem("role");
+
+        setFullName(storedFullName);
+        setMobile(storedMobile);
+        setRole(storedRole);
+
+        // 👉 Safety fallback (in case state missed)
+        if (storedRole === "owner") {
+            setDashboardTab("dashboard");
+        } else if (storedRole === "tenant") {
+            setDashboardTab("myLease");
+        }
     }, []);
 
     const menuItems = [
         // Tenant Menu
         { id: "myLease", label: "My Lease", icon: Home, roles: ["tenant"] },
         { id: "bookingRequests", label: "Booking Requests", icon: FileText, roles: ["tenant"] },
-        { id: "payments", label: "Payment History", icon: CreditCard, roles: ["tenant"] },
-        { id: "complaints", label: "Support & Complaints", icon: AlertCircle, roles: ["tenant"] },
-        { id: "MyProfile", label: "My Profile", icon: User, roles: ["tenant"] },
+        // { id: "payments", label: "Payment History", icon: CreditCard, roles: ["tenant"] },
+        // { id: "complaints", label: "Support & Complaints", icon: AlertCircle, roles: ["tenant"] },
         { id: "MyComplaints", label: "My Complaints", icon: Bell, roles: ["tenant"] },
+        { id: "MyFeedback", label: "My Feedback", icon: BadgeCheck, roles: ["tenant"] },
+        { id: "MyProfile", label: "My Profile", icon: User, roles: ["tenant"] },
+
 
         // Owner Menu
         { id: "dashboard", label: "Admin Dashboard", icon: Layout, roles: ["owner"] },
@@ -50,6 +77,7 @@ const DashboardPage = () => {
         { id: "bookingQueue", label: "Booking Queue", icon: ClipboardList, roles: ["owner"] },
         { id: "leaseDetails", label: "Lease Details", icon: FileText, roles: ["owner"] },
         { id: "adminComplaints", label: "Complaint Management", icon: AlertCircle, roles: ["owner"] },
+        { id: "adminFeedback", label: "Feedback Board", icon: Bell, roles: ["owner"] },
     ];
 
     return (
@@ -128,6 +156,7 @@ const DashboardPage = () => {
                                 {dashboardTab === "bookingQueue" && <BookingQueue />}
                                 {dashboardTab === "leaseDetails" && <LeaseDetails />}
                                 {dashboardTab === "adminComplaints" && <AdminComplaints />}
+                                {dashboardTab === "adminFeedback" && <AdminFeedback />}
                             </>
                         )}
                         {role === "tenant" && (
@@ -137,6 +166,7 @@ const DashboardPage = () => {
                                 {dashboardTab === "MyProfile" && <MyProfile />}
                                 {/* {dashboardTab === "payments" && <PaymentHistory />} */}
                                 {dashboardTab === "MyComplaints" && <MyComplaints />}
+                                {dashboardTab === "MyFeedback" && <MyFeedback />}
 
                             </>
                         )}

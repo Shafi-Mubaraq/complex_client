@@ -28,7 +28,7 @@ const AdminComplaints = () => {
         setIsRefreshing(true);
         try {
             const res = await axios.get(
-                `${apiUrl}/api/feedback/owner/${mobile}`,
+                `${apiUrl}/api/complaints/owner/${mobile}`, 
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             // Only update state if data actually changed to prevent unnecessary re-renders
@@ -175,7 +175,7 @@ const AdminComplaints = () => {
                                                 <p className="text-sm text-indigo-900 italic">"{complaint.response}"</p>
                                             </div>
                                         )}
-                                        {complaint.feedback && (
+                                        {/* {complaint.feedback && (
                                             <div className="flex-1 p-4 bg-amber-50 rounded-xl border border-amber-100">
                                                 <div className="flex justify-between items-center mb-1">
                                                     <p className="text-[10px] font-bold text-amber-700 uppercase">Tenant Feedback</p>
@@ -187,7 +187,7 @@ const AdminComplaints = () => {
                                                 </div>
                                                 <p className="text-sm text-amber-900 italic">"{complaint.feedback.comment || "No comment left."}"</p>
                                             </div>
-                                        )}
+                                        )} */}
                                     </div>
 
                                     <div className="flex flex-wrap gap-3 mt-8">
